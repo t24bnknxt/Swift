@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWIFT Corporate Actions Hub v4.0</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--bg4:#21262d;--bg5:#2d333b;
+  --bd:#30363d;--bd2:#484f58;--bd3:#6e7681;
+  --tx:#e6edf3;--tx2:#8b949e;--tx3:#6e7681;
+  --teal:#39c5cf;--teal2:#0e7490;--teal3:#164e63;
+  --blue:#58a6ff;--blue2:#1f6feb;--blue3:#0d419d;
+  --grn:#3fb950;--grn2:#196c2e;--grn3:#0d3d1a;
+  --amb:#d29922;--amb2:#9e6a03;--amb3:#5a3e00;
+  --red:#f85149;--red2:#8d1a1a;
+  --pur:#bc8cff;--pur2:#6e40c9;--pur3:#3d1f8a;
+  --coral:#ff9f7f;--coral2:#7d3a20;--coral3:#3d1a0a;
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --rad:6px;--rad2:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--bg);color:var(--tx);font-size:13px}
+button,input,select,textarea{font-family:var(--sans)}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+
+/* NAV */
+#nav{height:46px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:10}
+.logo{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--teal);letter-spacing:3px;white-space:nowrap}
+.logo span{color:var(--tx3);font-weight:400}
+.nsep{width:1px;height:22px;background:var(--bd);margin:0 4px}
+.ntabs{display:flex;gap:1px}
+.ntab{padding:5px 11px;font-size:11px;font-weight:500;border-radius:var(--rad);cursor:pointer;color:var(--tx2);border:none;background:none;transition:all .15s;white-space:nowrap}
+.ntab:hover{background:var(--bg3);color:var(--tx)}.ntab.active{background:var(--blue3);color:var(--blue)}
+.sp{flex:1}
+.mq-b{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--tx2);padding:3px 9px;border:1px solid var(--bd);border-radius:10px}
+.mqdot{width:7px;height:7px;border-radius:50%;background:var(--bd2);transition:background .3s}
+.mqdot.on{background:var(--grn);box-shadow:0 0 5px var(--grn)}
+.ib{padding:4px 10px;border:1px solid var(--bd);border-radius:var(--rad);background:var(--bg3);color:var(--tx2);cursor:pointer;font-size:11px;white-space:nowrap;transition:all .15s}
+.ib:hover{border-color:var(--teal);color:var(--teal)}
+.ib.pri{border-color:var(--blue2);color:var(--blue);background:var(--blue3)}
+.ib.grn{border-color:var(--grn2);color:var(--grn);background:var(--grn3)}
+.ib.amb{border-color:var(--amb2);color:var(--amb);background:var(--amb3)}
+.ib.red{border-color:var(--red2);color:var(--red)}
+
+/* LAYOUT */
+#root{display:flex;height:calc(100vh - 46px - 32px)}
+
+/* LEFT PANEL */
+#lp{width:272px;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
+#lp-top{padding:8px 10px;border-bottom:1px solid var(--bd);display:flex;flex-direction:column;gap:5px}
+.sw{position:relative;display:flex;align-items:center}
+.sw input{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rad);padding:5px 8px 5px 26px;font-size:11px;color:var(--tx)}
+.sw input:focus{outline:none;border-color:var(--teal)}.sw input::placeholder{color:var(--tx3)}
+.si{position:absolute;left:8px;font-size:11px;color:var(--tx3);pointer-events:none}
+.pat-row{display:flex;gap:4px}
+.pat-row input{flex:1;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rad);padding:4px 7px;font-size:10px;font-family:var(--mono);color:var(--teal)}
+.pat-row input:focus{outline:none;border-color:var(--teal)}.pat-row input::placeholder{color:var(--tx3)}
+.pat-row button{padding:4px 8px;background:var(--teal3);border:1px solid var(--teal2);border-radius:var(--rad);color:var(--teal);font-size:11px;cursor:pointer}
+.fb{display:flex;gap:3px;flex-wrap:wrap}
+.fc{font-size:9px;font-family:var(--mono);font-weight:600;padding:2px 7px;border-radius:8px;cursor:pointer;border:1px solid var(--bd);color:var(--tx2);transition:all .15s;white-space:nowrap}
+.fc:hover{border-color:var(--blue);color:var(--blue)}
+.fc.on{border-color:var(--blue);color:var(--blue);background:var(--blue3)}
+.fc.t564.on{background:rgba(57,197,207,.18);border-color:var(--teal2);color:var(--teal)}
+.fc.t565.on{background:rgba(188,140,255,.18);border-color:var(--pur2);color:var(--pur)}
+.fc.t566.on{background:rgba(63,185,80,.18);border-color:var(--grn2);color:var(--grn)}
+.fc.tpend.on{background:var(--amb3);border-color:var(--amb2);color:var(--amb)}
+.fc.tconf.on{background:var(--grn3);border-color:var(--grn2);color:var(--grn)}
+#ml{flex:1;overflow-y:auto}
+.mi{padding:7px 10px;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;border-left:2px solid transparent}
+.mi:hover{background:var(--bg3)}.mi.sel{background:var(--bg4);border-left-color:var(--teal)}
+.mi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.mtb{font-family:var(--mono);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px}
+.b564{background:rgba(57,197,207,.15);color:var(--teal);border:1px solid var(--teal2)}
+.b565{background:rgba(188,140,255,.15);color:var(--pur);border:1px solid var(--pur2)}
+.b566{background:rgba(63,185,80,.15);color:var(--grn);border:1px solid var(--grn2)}
+.mi-ref{font-family:var(--mono);font-size:10px;color:var(--tx);margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mi-sub{font-size:9px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mi-dt{font-size:8px;color:var(--tx3)}
+.stp{font-size:8px;padding:1px 5px;border-radius:4px}
+.stp-p{background:var(--amb3);color:var(--amb);border:1px solid var(--amb2)}
+.stp-e{background:var(--pur3);color:var(--pur);border:1px solid var(--pur2)}
+.stp-c{background:var(--grn3);color:var(--grn);border:1px solid var(--grn2)}
+#lp-foot{padding:6px 10px;border-top:1px solid var(--bd);display:flex;gap:4px}
+.lfb{flex:1;font-size:9px;padding:4px;background:var(--bg3);border:1px solid var(--bd);border-radius:4px;color:var(--tx2);cursor:pointer;text-align:center;transition:all .15s}
+.lfb:hover{border-color:var(--teal);color:var(--teal)}
+
+/* CENTER */
+#cp{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#tabs-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--bd);padding:0 10px;flex-shrink:0}
+.tab{padding:9px 12px;font-size:11px;cursor:pointer;color:var(--tx2);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;border-right:1px solid var(--bd)}
+.tab:hover{color:var(--tx)}.tab.active{color:var(--teal);border-bottom-color:var(--teal);background:rgba(57,197,207,.05)}
+#tc{flex:1;overflow:hidden;position:relative}
+.panel{position:absolute;inset:0;overflow-y:auto;padding:14px;display:none}
+.panel.show{display:block}
+
+/* VIEWER */
+.empty-st{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60%;color:var(--tx3);gap:10px}
+.empty-icon{font-size:40px;opacity:.25}
+.vh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.vh-title{font-family:var(--mono);font-size:15px;font-weight:700}
+.badge{font-size:9px;padding:2px 8px;border-radius:8px;font-family:var(--mono)}
+.badge.pend{background:var(--amb3);color:var(--amb);border:1px solid var(--amb2)}
+.badge.elec{background:var(--pur3);color:var(--pur);border:1px solid var(--pur2)}
+.badge.conf{background:var(--grn3);color:var(--grn);border:1px solid var(--grn2)}
+.badge.teal{background:rgba(57,197,207,.15);color:var(--teal);border:1px solid var(--teal2)}
+.badge.blue{background:var(--blue3);color:var(--blue);border:1px solid var(--blue2)}
+.vh-acts{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
+.mcs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.mc{font-size:10px;padding:3px 9px;background:var(--bg3);border:1px solid var(--bd);border-radius:4px;white-space:nowrap}
+.mc span{color:var(--tx3);margin-right:4px}
+.sc{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad2);margin-bottom:10px;overflow:hidden}
+.sc-hd{padding:7px 12px;font-size:10px;font-weight:600;font-family:var(--mono);color:var(--tx2);background:var(--bg3);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── QUALIFIER-AWARE TAG TABLE ── */
+.qtbl{width:100%;border-collapse:collapse}
+.qtbl th{background:var(--bg4);padding:5px 9px;font-size:9px;font-family:var(--mono);color:var(--tx3);text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0}
+.qtbl td{padding:5px 9px;font-size:10px;border-bottom:1px solid rgba(48,54,61,.4);vertical-align:top}
+.qtbl tr:last-child td{border-bottom:none}
+.qtbl tr:hover td{background:rgba(30,40,52,.5)}
+.q-tag{font-family:var(--mono);font-weight:700;color:var(--teal);white-space:nowrap}
+.q-qual{font-family:var(--mono);font-size:9px;color:var(--coral);background:rgba(255,159,127,.12);border:1px solid var(--coral2);border-radius:3px;padding:1px 5px;white-space:nowrap;display:inline-block}
+.q-qual.none{color:var(--tx3);background:transparent;border-color:transparent;font-style:italic}
+.q-lbl{color:var(--tx2);font-size:9px;line-height:1.4}
+.q-derived{font-family:var(--mono);font-size:10px;color:var(--tx);line-height:1.5;word-break:break-all}
+.q-raw{font-family:var(--mono);font-size:8px;color:var(--tx3);margin-top:2px;opacity:.7;word-break:break-all}
+.q-fmt-badge{font-size:8px;padding:1px 4px;border-radius:3px;font-family:var(--mono)}
+.q-fmt-date{background:rgba(57,197,207,.12);color:var(--teal);border:1px solid var(--teal2)}
+.q-fmt-amount{background:rgba(63,185,80,.12);color:var(--grn);border:1px solid var(--grn2)}
+.q-fmt-rate{background:rgba(210,153,34,.12);color:var(--amb);border:1px solid var(--amb2)}
+.q-fmt-indicator{background:rgba(188,140,255,.12);color:var(--pur);border:1px solid var(--pur2)}
+.q-fmt-qty{background:rgba(88,166,255,.12);color:var(--blue);border:1px solid var(--blue2)}
+.q-trained{font-size:8px;padding:1px 4px;background:rgba(63,185,80,.12);color:var(--grn);border:1px solid var(--grn2);border-radius:3px;white-space:nowrap}
+.q-ovr{font-size:9px;color:var(--pur);cursor:pointer;white-space:nowrap;opacity:.6;transition:opacity .15s;padding:1px 4px;border:1px solid transparent;border-radius:3px}
+.q-ovr:hover{opacity:1;border-color:var(--pur2);background:rgba(188,140,255,.1)}
+
+/* OPTIONS */
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.oc{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad2);padding:11px}
+.oc h4{font-size:11px;font-weight:600;margin-bottom:9px;color:var(--tx)}
+.or{display:flex;gap:7px;margin-bottom:6px;align-items:center}
+.or label{font-size:10px;color:var(--tx2);min-width:95px;flex-shrink:0}
+.or input,.or select{flex:1;background:var(--bg3);border:1px solid var(--bd);border-radius:4px;padding:4px 7px;font-size:11px;color:var(--tx)}
+.or input:focus,.or select:focus{outline:none;border-color:var(--teal)}
+.ropt{display:flex;gap:8px;align-items:center;padding:6px 9px;background:var(--bg3);border-radius:6px;margin-bottom:5px;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.ropt:hover{border-color:var(--bd2)}.ropt.sel{border-color:var(--grn);background:rgba(63,185,80,.08)}
+
+/* TRAINING */
+.tr-sec{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad2);margin-bottom:12px;overflow:hidden}
+.tr-hd{padding:9px 13px;background:var(--bg3);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.tr-hd h4{font-size:11px;font-weight:600}
+.tr-body{padding:11px 13px}
+/* training qualifier table */
+.trtbl{width:100%;border-collapse:collapse;font-size:10px}
+.trtbl th{background:var(--bg4);padding:5px 8px;font-size:9px;font-family:var(--mono);color:var(--tx3);text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0}
+.trtbl td{padding:5px 8px;border-bottom:1px solid rgba(48,54,61,.4);vertical-align:middle}
+.trtbl tr:last-child td{border-bottom:none}
+.trtbl tr:hover td{background:rgba(30,40,52,.4)}
+.trtbl input,.trtbl select{background:var(--bg3);border:1px solid var(--bd);border-radius:4px;padding:3px 6px;font-size:10px;color:var(--tx);font-family:var(--mono);width:100%}
+.trtbl input:focus,.trtbl select:focus{outline:none;border-color:var(--teal)}
+.tr-tag{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--teal);white-space:nowrap}
+.tr-qual{font-family:var(--mono);font-size:9px;color:var(--coral);background:rgba(255,159,127,.12);border:1px solid var(--coral2);border-radius:3px;padding:1px 5px;white-space:nowrap}
+.tr-hdr-pill{font-size:9px;padding:2px 6px;background:rgba(188,140,255,.1);border:1px solid var(--pur2);border-radius:3px;color:var(--pur);cursor:pointer;white-space:nowrap;transition:all .15s}
+.tr-hdr-pill:hover{background:rgba(188,140,255,.2)}
+.tr-cust{font-size:8px;color:var(--amb);white-space:nowrap}
+.tr-trained{font-size:8px;color:var(--grn);white-space:nowrap}
+/* derivation rule */
+.drule{display:flex;gap:6px;align-items:center;padding:5px 7px;background:var(--bg3);border-radius:5px;margin-bottom:5px;border:1px solid var(--bd)}
+.drule.on{border-color:var(--grn2)}
+.drtag{font-family:var(--mono);font-size:10px;color:var(--teal);min-width:40px}
+.drqual{font-family:var(--mono);font-size:9px;color:var(--coral);min-width:52px;background:rgba(255,159,127,.1);padding:1px 4px;border-radius:3px;border:1px solid var(--coral2)}
+.drarr{color:var(--tx3);font-size:12px}
+.drfield{font-size:10px;color:var(--tx);flex:1}
+.drfn{font-size:9px;color:var(--pur);font-family:var(--mono)}
+.drdel{font-size:10px;color:var(--red);cursor:pointer;padding:2px 5px;background:rgba(141,26,26,.3);border-radius:3px;opacity:.7;border:1px solid var(--red2)}
+.drdel:hover{opacity:1}
+.kb-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.kbs{background:var(--bg3);border-radius:6px;padding:9px;text-align:center}
+.kbs .n{font-family:var(--mono);font-size:19px;font-weight:700}
+.kbs .l{font-size:9px;color:var(--tx2);margin-top:2px}
+/* enquiry rules */
+.eqrow{display:flex;gap:6px;align-items:center;margin-bottom:5px;padding:5px 7px;background:var(--bg3);border-radius:5px;border:1px solid var(--bd)}
+.eqrow input{background:var(--bg4);border:1px solid var(--bd);border-radius:4px;padding:3px 6px;font-size:10px;color:var(--tx)}
+.eqrow input:focus{outline:none;border-color:var(--teal)}
+
+/* MQ */
+.mq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mq-log{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rad);padding:9px;font-family:var(--mono);font-size:10px;color:var(--tx2);height:155px;overflow-y:auto;line-height:1.9}
+.mle{display:flex;gap:8px}
+.mlt{color:var(--tx3)}.mlok{color:var(--grn)}.mlerr{color:var(--red)}.mlwn{color:var(--amb)}.mli{color:var(--teal)}
+
+/* EXPORT */
+.sheet-tabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--bd)}
+.stab{padding:6px 11px;font-size:10px;color:var(--tx2);cursor:pointer;border-right:1px solid var(--bd);transition:all .15s}
+.stab:hover,.stab.active{background:var(--bg4);color:var(--teal)}
+.stbl-wrap{overflow-x:auto;max-height:250px;overflow-y:auto}
+.stbl{font-family:var(--mono);font-size:9px;border-collapse:collapse;white-space:nowrap;width:100%}
+.stbl th{background:var(--bg3);padding:4px 10px;border:1px solid var(--bd);color:var(--teal);text-align:left;position:sticky;top:0}
+.stbl td{padding:3px 10px;border:1px solid var(--bd);color:var(--tx2)}
+.stbl tr:hover td{background:var(--bg3)}
+.ex-chks{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.echk{display:flex;gap:5px;align-items:center;font-size:11px;padding:5px 10px;background:var(--bg2);border:1px solid var(--bd);border-radius:5px;cursor:pointer;transition:all .15s}
+.echk:hover{border-color:var(--blue)}.echk.on{border-color:var(--blue);background:rgba(88,166,255,.08)}
+.echk input{accent-color:var(--blue)}
+.ex-btns{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.ex-btn{padding:7px 15px;border-radius:var(--rad);cursor:pointer;font-size:11px;font-weight:500;border:1px solid;transition:all .15s}
+.ex-xlsx{background:var(--grn3);border-color:var(--grn2);color:var(--grn)}.ex-xlsx:hover{background:rgba(63,185,80,.2)}
+.ex-csv{background:var(--bg3);border-color:var(--bd2);color:var(--tx2)}.ex-csv:hover{border-color:var(--teal);color:var(--teal)}
+.ex-json{background:var(--bg3);border-color:var(--bd2);color:var(--tx2)}.ex-json:hover{border-color:var(--amb);color:var(--amb)}
+
+/* ANALYTICS */
+.an-kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.an-k{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad2);padding:11px;text-align:center}
+.an-k .v{font-family:var(--mono);font-size:22px;font-weight:700}
+.an-k .l{font-size:9px;color:var(--tx2);margin-top:3px}
+.an-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.br{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.brl{font-size:10px;color:var(--tx2);min-width:55px;text-align:right;font-family:var(--mono)}
+.brt{flex:1;background:var(--bg3);border-radius:3px;height:7px;overflow:hidden}
+.brf{height:100%;border-radius:3px;transition:width .6s ease}
+.brv{font-size:10px;font-family:var(--mono);color:var(--tx2);min-width:22px;text-align:right}
+
+/* CHATBOT */
+#rp{width:336px;background:var(--bg2);border-left:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
+#ch-head{padding:9px 12px;border-bottom:1px solid var(--bd);display:flex;gap:8px;align-items:center}
+.ch-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--teal2),var(--blue2));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.ch-info h3{font-size:12px;font-weight:600}.ch-info p{font-size:9px;color:var(--tx2)}
+.mode-tabs{display:flex;gap:2px;margin-left:auto}
+.cmt{font-size:9px;padding:2px 7px;border-radius:4px;cursor:pointer;color:var(--tx2);border:1px solid transparent;transition:all .15s}
+.cmt:hover{color:var(--tx)}.cmt.active{background:var(--bg3);border-color:var(--bd);color:var(--teal)}
+#ch-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
+.cm{max-width:93%;display:flex;flex-direction:column;gap:2px}
+.cm.bot{align-self:flex-start}.cm.user{align-self:flex-end}
+.mb{padding:7px 10px;font-size:11px;line-height:1.55}
+.cm.bot .mb{background:var(--bg3);border:1px solid var(--bd);border-radius:8px 8px 8px 2px;color:var(--tx)}
+.cm.user .mb{background:var(--blue3);border:1px solid var(--blue2);color:var(--blue);border-radius:8px 8px 2px 8px}
+.mb code{font-family:var(--mono);font-size:9px;background:var(--bg4);padding:1px 4px;border-radius:3px;color:var(--teal)}
+.mb strong{font-weight:600;color:var(--tx)}
+.ch-time{font-size:8px;color:var(--tx3)}.cm.user .ch-time{text-align:right}
+.ch-sugs{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.sug{font-size:9px;padding:2px 7px;background:var(--bg4);border:1px solid var(--bd);border-radius:6px;cursor:pointer;color:var(--tx2);transition:all .15s}
+.sug:hover{border-color:var(--teal);color:var(--teal)}
+#ch-foot{padding:8px 10px;border-top:1px solid var(--bd);display:flex;gap:5px}
+#ch-in{flex:1;background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:6px 9px;font-size:11px;color:var(--tx);resize:none;max-height:90px;line-height:1.5}
+#ch-in:focus{outline:none;border-color:var(--teal)}
+#ch-send{background:var(--teal2);border:1px solid var(--teal);border-radius:7px;padding:6px 11px;color:#fff;cursor:pointer;font-size:11px;font-weight:500;transition:all .15s}
+#ch-send:hover{background:var(--teal)}
+.typing .mb{display:flex;align-items:center;gap:3px;padding:9px 12px}
+.tdot{width:5px;height:5px;background:var(--teal);border-radius:50%;animation:tdot 1.2s ease-in-out infinite}
+.tdot:nth-child(2){animation-delay:.2s}.tdot:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* STATUS BAR */
+#sb{height:32px;background:var(--bg3);border-top:1px solid var(--bd);display:flex;align-items:center;padding:0 14px;gap:16px;flex-shrink:0}
+.sb-i{display:flex;gap:5px;align-items:center}
+.sb-l{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px}
+.sb-v{font-family:var(--mono);font-size:10px;font-weight:600}
+.sb-v.tc{color:var(--teal)}.sb-v.pu{color:var(--pur)}.sb-v.gn{color:var(--grn)}.sb-v.am{color:var(--amb)}
+.sb-sep{width:1px;height:14px;background:var(--bd)}
+.pb-w{display:flex;align-items:center;gap:5px;margin-left:auto}
+.pb{width:70px;height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
+.pbf{height:100%;background:var(--teal);border-radius:2px;transition:width .5s}
+.sb-ver{font-size:9px;color:var(--tx3);margin-left:8px}
+
+/* MODALS */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:999}
+.mbg.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rad2);padding:18px;width:520px;max-width:96vw;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:13px;font-weight:600;margin-bottom:13px}
+.mf{margin-bottom:9px}
+.mf label{display:block;font-size:10px;color:var(--tx2);margin-bottom:4px}
+.mf input,.mf textarea,.mf select{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:11px;color:var(--tx)}
+.mf input:focus,.mf textarea:focus,.mf select:focus{outline:none;border-color:var(--blue)}
+.mf textarea{resize:vertical;font-family:var(--mono);font-size:10px}
+.modal-acts{display:flex;gap:7px;justify-content:flex-end;margin-top:14px}
+.modal-acts button{padding:5px 14px;border-radius:5px;font-size:11px;cursor:pointer;border:1px solid}
+.mb-cancel{background:var(--bg3);border-color:var(--bd);color:var(--tx2)}
+.mb-ok{background:var(--blue3);border-color:var(--blue2);color:var(--blue)}
+.mb-ok:hover{background:var(--blue2)}
+.modal-2col{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:5px}
+.ti{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rad2);padding:9px 14px;font-size:11px;display:flex;gap:8px;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:sli .3s ease;min-width:220px}
+.ti.ok{border-left:3px solid var(--grn)}.ti.err{border-left:3px solid var(--red)}.ti.info{border-left:3px solid var(--blue)}
+@keyframes sli{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* RAW */
+.raw-block{font-family:var(--mono);font-size:11px;white-space:pre-wrap;padding:12px;line-height:1.8;background:var(--bg2);border-radius:var(--rad2);border:1px solid var(--bd)}
+.rt{color:var(--teal);font-weight:600}.rq{color:var(--coral);font-weight:600}.rv{color:var(--tx)}.rb{color:var(--pur);font-weight:600}
+
+/* RETRIEVAL PANEL */
+.ret-form{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rad2);padding:14px;margin-bottom:12px}
+.ret-form h4{font-size:11px;font-weight:600;margin-bottom:10px;color:var(--tx);display:flex;align-items:center;gap:6px}
+.ret-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.ret-field{display:flex;flex-direction:column;gap:3px}
+.ret-field label{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px;font-family:var(--mono)}
+.ret-field input,.ret-field select{background:var(--bg3);border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:11px;color:var(--tx);font-family:var(--mono)}
+.ret-field input:focus,.ret-field select:focus{outline:none;border-color:var(--teal)}
+.ret-field input::placeholder{color:var(--tx3);font-family:var(--sans)}
+.ret-results{display:flex;flex-direction:column;gap:6px}
+.ret-card{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rad2);padding:10px 12px;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.ret-card:hover{background:var(--bg4);border-color:var(--bd2)}
+.ret-card.r564{border-left-color:var(--teal)}.ret-card.r565{border-left-color:var(--pur)}.ret-card.r566{border-left-color:var(--grn)}
+.ret-card-top{display:flex;gap:8px;align-items:center;margin-bottom:5px}
+.ret-card-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.ret-cf{font-size:9px;color:var(--tx2)}.ret-cf span{color:var(--teal);font-family:var(--mono)}
+.ret-none{text-align:center;padding:24px;color:var(--tx3);font-size:11px}
+.ret-none .ret-icon{font-size:28px;opacity:.3;margin-bottom:6px}
+
+/* VALIDATION */
+.val-err{background:rgba(248,81,73,.12);border:1px solid var(--red2);border-radius:var(--rad);padding:8px 11px;font-size:11px;color:var(--red);display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.val-warn{background:rgba(210,153,34,.12);border:1px solid var(--amb2);border-radius:var(--rad);padding:8px 11px;font-size:11px;color:var(--amb);display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.val-ok{background:rgba(63,185,80,.12);border:1px solid var(--grn2);border-radius:var(--rad);padding:8px 11px;font-size:11px;color:var(--grn);display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.qty-bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin-top:4px}
+.qty-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+
+/* CHAT SECTION CARDS */
+.ch-section{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rad);padding:9px 11px;margin-bottom:6px}
+.ch-section-title{font-size:10px;font-weight:600;color:var(--teal);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.ch-section p{font-size:10px;color:var(--tx2);line-height:1.55}
+.ch-fn{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.ch-fn-tag{font-size:9px;padding:1px 6px;background:rgba(57,197,207,.1);border:1px solid var(--teal2);border-radius:4px;color:var(--teal);cursor:pointer;transition:all .15s;font-family:var(--mono)}
+.ch-fn-tag:hover{background:rgba(57,197,207,.2)}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <div class="logo">◈ BnkNxt Corporate Actions SWIFT<span>-HUB</span></div>
+  <div class="nsep"></div>
+  <div class="ntabs">
+    <button class="ntab active" onclick="switchView('messages')">Messages</button>
+    <button class="ntab" onclick="switchView('training')">Training</button>
+    <button class="ntab" onclick="switchView('mq')">Message Queue</button>
+    <button class="ntab" onclick="switchView('export')">Export</button>
+    <button class="ntab" onclick="switchView('analytics')">Analytics</button>
+  </div>
+  <div class="sp"></div>
+  <div class="mq-b"><div class="mqdot" id="mqdot"></div><span id="mqlabel">MQ: Idle</span></div>
+  <button class="ib" onclick="openImport()">+ Import</button>
+  <button class="ib pri" onclick="genS564()">⚡ MT564</button>
+  <button class="ib" onclick="genS565()">⚡ MT565</button>
+</div>
+
+<div id="root">
+  <div id="lp">
+    <div id="lp-top">
+      <div class="sw"><span class="si">⌕</span><input id="s-in" placeholder="Search ref, ISIN, qualifier, derived value..." oninput="renderList()"></div>
+      <div class="pat-row"><input id="s-pat" placeholder="regex e.g. :20C:.*CORP" title="Regex pattern search (raw message)"><button onclick="renderList()">∗</button></div>
+      <div class="fb">
+        <span class="fc on" onclick="setF('all',this)">ALL</span>
+        <span class="fc t564" onclick="setF('564',this)">MT564</span>
+        <span class="fc t565" onclick="setF('565',this)">MT565</span>
+        <span class="fc t566" onclick="setF('566',this)">MT566</span>
+        <span class="fc tpend" onclick="setF('pending',this)">PEND</span>
+        <span class="fc tconf" onclick="setF('confirmed',this)">CONF</span>
+      </div>
+    </div>
+    <div id="ml"></div>
+    <div id="lp-foot">
+      <div class="lfb" onclick="clearAll()">🗑 Clear</div>
+      <div class="lfb" onclick="switchView('export')">📥 Export</div>
+      <div class="lfb" onclick="switchView('analytics')">📊 Stats</div>
+      <div class="lfb" onclick="genBulk()">⚡ Bulk</div>
+    </div>
+  </div>
+
+  <div id="cp">
+    <div id="tabs-bar">
+      <div class="tab active" onclick="switchTab('viewer')">Detail</div>
+      <div class="tab" onclick="switchTab('options')">MT565 Options</div>
+      <div class="tab" onclick="switchTab('gen566')">Generate MT566</div>
+      <div class="tab" onclick="switchTab('related')">Related Events</div>
+      <div class="tab" onclick="switchTab('raw')">Raw SWIFT</div>
+      <div class="tab" onclick="switchTab('retrieve')">🔍 Retrieve</div>
+    </div>
+    <div id="tc">
+      <div class="panel show" id="p-viewer"><div class="empty-st"><div class="empty-icon">📋</div><div>Select or generate a message</div><button class="ib pri" style="margin-top:8px" onclick="genS564()">⚡ Generate MT564</button></div></div>
+      <div class="panel" id="p-options"></div>
+      <div class="panel" id="p-gen566"></div>
+      <div class="panel" id="p-related"></div>
+      <div class="panel" id="p-raw"></div>
+      <div class="panel" id="p-retrieve"></div>
+      <div class="panel" id="p-training"></div>
+      <div class="panel" id="p-mq"></div>
+      <div class="panel" id="p-export"></div>
+      <div class="panel" id="p-analytics"></div>
+    </div>
+  </div>
+
+  <div id="rp">
+    <div id="ch-head">
+      <div class="ch-av">CA</div>
+      <div class="ch-info"><h3>SWIFT Assistant</h3><p>Qualifier-aware · ISO 15022</p></div>
+      <div class="mode-tabs">
+        <div class="cmt active" onclick="setCM('query')">Query</div>
+        <div class="cmt" onclick="setCM('train')">Train</div>
+        <div class="cmt" onclick="setCM('mq')">MQ</div>
+      </div>
+    </div>
+    <div id="ch-msgs"></div>
+    <div id="ch-foot">
+      <textarea id="ch-in" rows="2" placeholder="Ask about tags, qualifiers, events..." onkeydown="chatKey(event)"></textarea>
+      <button id="ch-send" onclick="sendChat()">↑</button>
+    </div>
+  </div>
+</div>
+
+<div id="sb">
+  <div class="sb-i"><span class="sb-l">Total</span><span class="sb-v" id="s-tot">0</span></div>
+  <div class="sb-sep"></div>
+  <div class="sb-i"><span class="sb-l">MT564</span><span class="sb-v tc" id="s-564">0</span></div>
+  <div class="sb-i"><span class="sb-l">MT565</span><span class="sb-v pu" id="s-565">0</span></div>
+  <div class="sb-i"><span class="sb-l">MT566</span><span class="sb-v gn" id="s-566">0</span></div>
+  <div class="sb-sep"></div>
+  <div class="sb-i"><span class="sb-l">Events</span><span class="sb-v am" id="s-evts">0</span></div>
+  <div class="sb-i"><span class="sb-l">Pending</span><span class="sb-v" id="s-pend">0</span></div>
+  <div class="sb-i"><span class="sb-l">Confirmed</span><span class="sb-v gn" id="s-conf">0</span></div>
+  <div class="pb-w"><span class="sb-l">DB</span><span class="sb-v" id="s-db">0 KB</span><div class="pb"><div class="pbf" id="pb-f" style="width:1%"></div></div></div>
+  <div class="sb-ver">v4.0 · Retrieval · Validation · ISO 15022</div>
+</div>
+
+<!-- TAG OVERRIDE MODAL -->
+<div class="mbg" id="tag-mbg">
+  <div class="modal">
+    <h3>Override Tag · Qualifier Classification</h3>
+    <div class="modal-2col">
+      <div class="mf"><label>Tag</label><input id="mo-tag" readonly style="font-family:var(--mono);color:var(--teal)"></div>
+      <div class="mf"><label>Qualifier</label><input id="mo-qual" readonly style="font-family:var(--mono);color:var(--coral)"></div>
+    </div>
+    <div class="mf"><label>ISO 15022 Standard Label</label><input id="mo-std" readonly style="color:var(--tx2)"></div>
+    <div class="mf"><label>Current Group Header</label><input id="mo-cur" readonly style="color:var(--tx2)"></div>
+    <div class="mf"><label>Override Group Header <span style="color:var(--tx3)">(required)</span></label><input id="mo-hdr" placeholder="e.g. Settlement Details"></div>
+    <div class="mf"><label>Override Field Label <span style="color:var(--tx3)">(optional)</span></label><input id="mo-lbl" placeholder="e.g. Settlement Date"></div>
+    <div class="mf"><label>Value Derivation Format</label>
+      <select id="mo-fmt" onchange="document.getElementById('mo-rx-row').style.display=this.value==='custom'?'block':'none'">
+        <option value="raw">raw — show as-is</option>
+        <option value="date">date — YYYYMMDD → DD Mon YYYY</option>
+        <option value="datetime">datetime — YYYYMMDDHHMMSS → readable</option>
+        <option value="amount">amount — CCYnnn.nn → CCY n,nnn.nn</option>
+        <option value="rate">rate — Nnn.nn / Pnn.nn → ±value</option>
+        <option value="quantity">quantity — TYPE/nnn → n units</option>
+        <option value="indicator">indicator — code → description</option>
+        <option value="party">party — clean BIC / name</option>
+        <option value="split_slash">split_slash — take value after //</option>
+        <option value="custom">custom — regex transform</option>
+      </select>
+    </div>
+    <div class="mf" id="mo-rx-row" style="display:none"><label>Custom Regex (JS syntax: /pattern/flags → template)</label><input id="mo-rx" placeholder="e.g. /([A-Z]{3})([\d.]+)/ → $1 $2"></div>
+    <div class="mf"><label>Notes</label><input id="mo-notes" placeholder="Reason for override"></div>
+    <div class="modal-acts">
+      <button class="mb-cancel" onclick="closeTagModal()">Cancel</button>
+      <button class="mb-ok" onclick="saveTagOverride()">Save Override</button>
+    </div>
+  </div>
+</div>
+
+<!-- DERIVATION RULE MODAL -->
+<div class="mbg" id="deriv-mbg">
+  <div class="modal">
+    <h3>Add Derivation Rule</h3>
+    <p style="font-size:10px;color:var(--tx2);margin-bottom:12px">Train the system how to extract and display meaningful values from a Tag+Qualifier combination. Rules override standard ISO formats.</p>
+    <div class="modal-2col">
+      <div class="mf"><label>SWIFT Tag</label><input id="dr-tag" placeholder="e.g. 20C" style="font-family:var(--mono)"></div>
+      <div class="mf"><label>Qualifier <span style="color:var(--tx3)">(* for any)</span></label><input id="dr-qual" placeholder="e.g. CORP or *" style="font-family:var(--mono)"></div>
+    </div>
+    <div class="modal-2col">
+      <div class="mf"><label>Group Header</label><input id="dr-hdr" placeholder="e.g. References"></div>
+      <div class="mf"><label>Field Label</label><input id="dr-lbl" placeholder="e.g. Corporate Reference"></div>
+    </div>
+    <div class="mf"><label>Derivation Format</label>
+      <select id="dr-fmt" onchange="document.getElementById('dr-rx-row').style.display=this.value==='custom'?'block':'none';updateDrPrev()">
+        <option value="raw">raw — show as-is</option>
+        <option value="date">date — YYYYMMDD → DD Mon YYYY</option>
+        <option value="datetime">datetime — YYYYMMDDHHMMSS</option>
+        <option value="amount">amount — CCYnnn.nn parse</option>
+        <option value="rate">rate — Nnn.nn / Pnn.nn parse</option>
+        <option value="quantity">quantity — TYPE/nnn parse</option>
+        <option value="indicator">indicator — code lookup</option>
+        <option value="party">party — BIC/name cleanup</option>
+        <option value="split_slash">split_slash — take after //</option>
+        <option value="custom">custom — regex transform</option>
+      </select>
+    </div>
+    <div class="mf" id="dr-rx-row" style="display:none"><label>Custom Regex (JS: /pattern/ → template)</label><input id="dr-rx" placeholder="e.g. /([A-Z]{3})([\d.]+)/ → $1 $2" oninput="updateDrPrev()"></div>
+    <div class="mf"><label>Test Raw Value</label><input id="dr-ex" placeholder="paste a sample raw value to preview" oninput="updateDrPrev()"></div>
+    <div id="dr-prev" style="display:none;margin-bottom:10px;padding:8px;background:var(--bg3);border:1px solid var(--bd);border-radius:5px;font-size:10px"><span style="color:var(--tx3)">Derived: </span><span id="dr-prev-v" style="font-family:var(--mono);color:var(--grn)"></span></div>
+    <div class="mf"><label>Applies to Message Types</label>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <label style="font-size:11px;display:flex;gap:4px;align-items:center"><input type="checkbox" id="dr-564" checked style="accent-color:var(--teal)"> MT564</label>
+        <label style="font-size:11px;display:flex;gap:4px;align-items:center"><input type="checkbox" id="dr-565" checked style="accent-color:var(--pur)"> MT565</label>
+        <label style="font-size:11px;display:flex;gap:4px;align-items:center"><input type="checkbox" id="dr-566" checked style="accent-color:var(--grn)"> MT566</label>
+      </div>
+    </div>
+    <div class="mf"><label>Notes</label><input id="dr-notes" placeholder="Why this derivation is needed"></div>
+    <div class="modal-acts">
+      <button class="mb-cancel" onclick="closeDeriv()">Cancel</button>
+      <button class="mb-ok" onclick="saveDerivRule()">Save Rule</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="mbg" id="im-mbg">
+  <div class="modal" style="width:560px">
+    <h3>Import SWIFT Message</h3>
+    <div class="mf"><label>Message Type</label>
+      <select id="im-type"><option value="auto">Auto-detect</option><option>MT564</option><option>MT565</option><option>MT566</option></select>
+    </div>
+    <div class="mf"><label>Paste Raw SWIFT</label>
+      <textarea id="im-raw" style="min-height:190px;line-height:1.7" placeholder=":16R:GENL&#10;:20C::CORP//CA12345&#10;:23G:NEWM&#10;:22F::CAEV//DVCA&#10;..."></textarea>
+    </div>
+    <div class="mf"><label>Notes</label><input id="im-notes" placeholder="Source system, counterparty, etc."></div>
+    <div class="modal-acts">
+      <button class="mb-cancel" onclick="closeImport()">Cancel</button>
+      <button class="mb-ok" onclick="doImport()">Import &amp; Parse</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════════════
+//  ISO 15022 QUALIFIER DICTIONARY
+//  QLOOKUP[tag][qualifier] = { l: field label, h: group header, fmt: format }
+// ══════════════════════════════════════════════════════════════════
+const QLOOKUP = {
+  '20C':{
+    'CORP':{l:'Corporate Reference',h:'References',fmt:'raw'},
+    'CANO':{l:'CA Notification Ref',h:'References',fmt:'raw'},
+    'INST':{l:'Instruction Reference',h:'References',fmt:'raw'},
+    'CONF':{l:'Confirmation Reference',h:'References',fmt:'raw'},
+    'PREV':{l:'Previous Reference',h:'References',fmt:'raw'},
+    'MASE':{l:'Market Side Reference',h:'References',fmt:'raw'},
+    'CLTR':{l:'Client Transaction Ref',h:'References',fmt:'raw'},
+    'LINK':{l:'Linked Reference',h:'References',fmt:'raw'},
+  },
+  '22F':{
+    'CAEV':{l:'CA Event Type',h:'Corporate Action Details',fmt:'indicator'},
+    'CAMV':{l:'CA Mandatory/Voluntary',h:'Corporate Action Details',fmt:'indicator'},
+    'DIST':{l:'Distribution Type',h:'Corporate Action Details',fmt:'indicator'},
+    'ADDB':{l:'Additional Business',h:'Corporate Action Details',fmt:'indicator'},
+    'CAOP':{l:'CA Option Type',h:'Options',fmt:'indicator'},
+    'TAXF':{l:'Tax Flag',h:'Tax',fmt:'indicator'},
+    'RHDI':{l:'Reversal Holdings',h:'Corporate Action Details',fmt:'indicator'},
+  },
+  '22H':{
+    'CAOP':{l:'Elected CA Option',h:'Options',fmt:'indicator'},
+    'PAYM':{l:'Payment Method',h:'Amounts',fmt:'indicator'},
+  },
+  '25D':{
+    'PROC':{l:'Processing Status',h:'Status',fmt:'indicator'},
+    'SETT':{l:'Settlement Status',h:'Status',fmt:'indicator'},
+    'CONF':{l:'Confirmation Status',h:'Status',fmt:'indicator'},
+  },
+  '98A':{
+    'RDDT':{l:'Record Date',h:'Dates',fmt:'date'},
+    'EXDT':{l:'Ex-Dividend Date',h:'Dates',fmt:'date'},
+    'PAYD':{l:'Payment Date',h:'Dates',fmt:'date'},
+    'EFFD':{l:'Effective Date',h:'Dates',fmt:'date'},
+    'MKDT':{l:'Market Deadline',h:'Dates',fmt:'date'},
+    'RDTE':{l:'Registration Date',h:'Dates',fmt:'date'},
+    'MEET':{l:'Meeting Date',h:'Dates',fmt:'date'},
+    'SETT':{l:'Settlement Date',h:'Dates',fmt:'date'},
+    'XDTE':{l:'Ex-Date',h:'Dates',fmt:'date'},
+  },
+  '98C':{
+    'PREP':{l:'Preparation Date/Time',h:'Dates',fmt:'datetime'},
+    'SETT':{l:'Settlement Date/Time',h:'Dates',fmt:'datetime'},
+    'CONF':{l:'Confirmation Date/Time',h:'Dates',fmt:'datetime'},
+    'PROC':{l:'Processing Date/Time',h:'Dates',fmt:'datetime'},
+  },
+  '98B':{
+    'PAYD':{l:'Payment Date Type',h:'Dates',fmt:'raw'},
+    'XDTE':{l:'Ex-Date Type',h:'Dates',fmt:'raw'},
+  },
+  '92A':{
+    'GRSS':{l:'Gross Rate',h:'Rates',fmt:'rate'},
+    'NETT':{l:'Net Rate',h:'Rates',fmt:'rate'},
+    'TAXR':{l:'Tax Rate',h:'Tax',fmt:'rate'},
+    'PRFC':{l:'Price Factor',h:'Prices',fmt:'rate'},
+    'WITF':{l:'Withholding Tax (Foreign)',h:'Tax',fmt:'rate'},
+    'WITL':{l:'Withholding Tax (Local)',h:'Tax',fmt:'rate'},
+  },
+  '92B':{'EXCH':{l:'Exchange Rate',h:'Rates',fmt:'rate'}},
+  '92D':{'NEWO':{l:'New to Old Quantity Rate',h:'Rates',fmt:'rate'}},
+  '93B':{
+    'ELIG':{l:'Eligible Balance',h:'Balances',fmt:'quantity'},
+    'SETT':{l:'Settlement Balance',h:'Balances',fmt:'quantity'},
+    'BLOK':{l:'Blocked Balance',h:'Balances',fmt:'quantity'},
+    'ENTL':{l:'Entitlement Balance',h:'Balances',fmt:'quantity'},
+  },
+  '36B':{
+    'ELIG':{l:'Eligible Quantity',h:'Quantities',fmt:'quantity'},
+    'ENTL':{l:'Entitled Quantity',h:'Quantities',fmt:'quantity'},
+    'MAXI':{l:'Maximum Quantity',h:'Quantities',fmt:'quantity'},
+    'MINI':{l:'Minimum Quantity',h:'Quantities',fmt:'quantity'},
+    'NEWO':{l:'New Quantity',h:'Quantities',fmt:'quantity'},
+    'SETT':{l:'Settlement Quantity',h:'Quantities',fmt:'quantity'},
+  },
+  '19A':{
+    'ENTL':{l:'Cash Entitlement',h:'Amounts',fmt:'amount'},
+    'GRSS':{l:'Gross Amount',h:'Amounts',fmt:'amount'},
+    'NETT':{l:'Net Amount',h:'Amounts',fmt:'amount'},
+    'TXFR':{l:'Tax Amount (Foreign)',h:'Tax',fmt:'amount'},
+    'TAXE':{l:'Tax Amount',h:'Tax',fmt:'amount'},
+    'CHAR':{l:'Charges',h:'Amounts',fmt:'amount'},
+    'EXEC':{l:'Executed Amount',h:'Amounts',fmt:'amount'},
+  },
+  '90A':{'PRPP':{l:'Previous Closing Price',h:'Prices',fmt:'rate'},'MRKT':{l:'Market Price',h:'Prices',fmt:'rate'}},
+  '90B':{'MRKT':{l:'Market Price (Amount)',h:'Prices',fmt:'amount'},'INDX':{l:'Index Price',h:'Prices',fmt:'amount'}},
+  '94B':{'SAFE':{l:'Place of Safekeeping',h:'Places',fmt:'raw'},'PLIS':{l:'Place of Listing',h:'Places',fmt:'raw'},'TRAD':{l:'Place of Trade',h:'Places',fmt:'raw'},'SETT':{l:'Place of Settlement',h:'Places',fmt:'raw'}},
+  '95P':{'MEOR':{l:'Message Originator (BIC)',h:'Parties',fmt:'party'},'MERE':{l:'Message Recipient (BIC)',h:'Parties',fmt:'party'},'ISAG':{l:'Issuer Agent (BIC)',h:'Parties',fmt:'party'},'CUST':{l:'Custodian (BIC)',h:'Parties',fmt:'party'},'PAYE':{l:'Paying Agent (BIC)',h:'Parties',fmt:'party'}},
+  '95R':{'MEOR':{l:'Message Originator (Prop)',h:'Parties',fmt:'party'},'MERE':{l:'Message Recipient (Prop)',h:'Parties',fmt:'party'}},
+  '97A':{'SAFE':{l:'Safekeeping Account',h:'Accounts',fmt:'raw'},'CASH':{l:'Cash Account',h:'Accounts',fmt:'raw'},'CHAR':{l:'Charges Account',h:'Accounts',fmt:'raw'}},
+  '70E':{'ADTX':{l:'Additional Text',h:'Free Text',fmt:'raw'},'TXNR':{l:'Tax Narrative',h:'Tax',fmt:'raw'}},
+  '70G':{'TXNR':{l:'Tax Narrative (GENL)',h:'Tax',fmt:'raw'},'CORP':{l:'CA Narrative',h:'Free Text',fmt:'raw'}},
+  '13A':{'CAON':{l:'CA Option Number',h:'Options',fmt:'raw'},'LINK':{l:'Linked Message Number',h:'References',fmt:'raw'}},
+  '69A':{'PRIC':{l:'Pricing Period',h:'Dates',fmt:'date'},'MEET':{l:'Meeting Period',h:'Dates',fmt:'date'}},
+};
+
+// Base tag info (used when no qualifier match)
+const TAGS = {
+  '16R':{l:'Block Start',h:'Message Structure'},'16S':{l:'Block End',h:'Message Structure'},
+  '20C':{l:'Reference',h:'References'},'21C':{l:'Linked Reference',h:'References'},
+  '22F':{l:'Indicator',h:'Corporate Action Details'},'22H':{l:'Indicator (Holdings)',h:'Corporate Action Details'},
+  '23G':{l:'Function of Message',h:'General Information'},'25D':{l:'Status Code',h:'Status'},
+  '35B':{l:'Security Identification',h:'Security Details'},'36B':{l:'Quantity',h:'Quantities'},
+  '11A':{l:'Currency of Denomination',h:'Amounts'},'13A':{l:'Number Identification',h:'References'},
+  '13B':{l:'Number (Type)',h:'References'},'19A':{l:'Amount',h:'Amounts'},
+  '69A':{l:'Period (Date Range)',h:'Dates'},'69B':{l:'Period (Date/Time)',h:'Dates'},
+  '70E':{l:'Narrative',h:'Free Text'},'70G':{l:'Narrative (GENL)',h:'Free Text'},
+  '90A':{l:'Price (Rate)',h:'Prices'},'90B':{l:'Price (Amount)',h:'Prices'},
+  '92A':{l:'Rate',h:'Rates'},'92B':{l:'Exchange Rate',h:'Rates'},'92D':{l:'Qty/Qty Rate',h:'Rates'},
+  '93B':{l:'Balance',h:'Balances'},'94B':{l:'Place',h:'Places'},'94C':{l:'Country',h:'Places'},
+  '95P':{l:'Party (BIC)',h:'Parties'},'95Q':{l:'Party (Name)',h:'Parties'},'95R':{l:'Party (Prop)',h:'Parties'},
+  '97A':{l:'Account',h:'Accounts'},'97B':{l:'Account (Type)',h:'Accounts'},
+  '98A':{l:'Date',h:'Dates'},'98B':{l:'Date (Code)',h:'Dates'},'98C':{l:'Date/Time',h:'Dates'},
+  '17B':{l:'Flag',h:'Indicators'},'12A':{l:'Financial Instrument Type',h:'Security Details'},
+};
+
+// Indicator codes lookup
+const INDS = {
+  DVCA:'Cash Dividend',BONU:'Bonus Issue',RHTS:'Rights Issue',TEND:'Tender Offer',MRGR:'Merger',
+  SPLF:'Stock Split',INTR:'Interest Payment',CAPD:'Capital Distribution',CONV:'Conversion',
+  DRIP:'Dividend Reinvestment',REDM:'Redemption',EXTM:'Extension',SOFF:'Spin-Off',
+  MAND:'Mandatory',VOLU:'Voluntary',CHOS:'Choice',
+  CASH:'Cash',SECU:'Securities',NOPH:'No Action',
+  ENTL:'Entitled',CONF:'Confirmed',PEND:'Pending',CANC:'Cancelled',SETT:'Settled',
+  FAIL:'Failed',REJT:'Rejected',PACK:'Accepted',COND:'Conditional',INCO:'Incomplete',
+};
+
+const CAEV = {DVCA:'Cash Dividend',BONU:'Bonus Issue',RHTS:'Rights Issue',TEND:'Tender Offer',MRGR:'Merger',SPLF:'Stock Split',INTR:'Interest Payment',CAPD:'Capital Distribution',CONV:'Conversion',DRIP:'Dividend Reinvestment',REDM:'Redemption',EXTM:'Extension',SOFF:'Spin-Off'};
+
+// ══════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════
+let DB=null, msgs=[], selId=null, curFilter='all';
+let tagOverrides={};   // key = "TAG|QUALIFIER" → {header,label,fmt,rx,notes}
+let derivRules=[];     // custom trained rules [{id,tag,qualifier,header,label,fmt,rx,...}]
+let enquiryRules=[];
+let mqCfg={}, mqConn=false, chatMode='query';
+let curView='messages', curTab='viewer';
+
+// ══════════════════════════════════════════════════════════════════
+//  INDEXEDDB
+// ══════════════════════════════════════════════════════════════════
+function initDB(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open('SwiftHubV4',2);
+    r.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('messages')){
+        const ms=d.createObjectStore('messages',{keyPath:'id'});
+        ms.createIndex('type','type');ms.createIndex('caRef','caRef');ms.createIndex('status','status');
+      }
+      if(!d.objectStoreNames.contains('tagClass'))d.createObjectStore('tagClass',{keyPath:'k'});
+      if(!d.objectStoreNames.contains('derivRules'))d.createObjectStore('derivRules',{keyPath:'id',autoIncrement:true});
+      if(!d.objectStoreNames.contains('eqRules'))d.createObjectStore('eqRules',{keyPath:'id',autoIncrement:true});
+      if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'key'});
+    };
+    r.onsuccess=e=>{DB=e.target.result;res();};r.onerror=()=>rej(r.error);
+  });
+}
+const dbPut=(st,obj)=>new Promise((res,rej)=>{const tx=DB.transaction(st,'readwrite');const rq=tx.objectStore(st).put(obj);rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej(rq.error);});
+const dbGet=(st,key)=>new Promise((res,rej)=>{const tx=DB.transaction(st,'readonly');const rq=tx.objectStore(st).get(key);rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej(rq.error);});
+const dbAll=(st)=>new Promise((res,rej)=>{const tx=DB.transaction(st,'readonly');const rq=tx.objectStore(st).getAll();rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej(rq.error);});
+const dbDel=(st,key)=>new Promise((res,rej)=>{const tx=DB.transaction(st,'readwrite');const rq=tx.objectStore(st).delete(key);rq.onsuccess=()=>res();rq.onerror=()=>rej(rq.error);});
+const dbClear=(st)=>new Promise((res,rej)=>{const tx=DB.transaction(st,'readwrite');const rq=tx.objectStore(st).clear();rq.onsuccess=()=>res();rq.onerror=()=>rej(rq.error);});
+
+// ══════════════════════════════════════════════════════════════════
+//  QUALIFIER-AWARE SWIFT PARSER
+//  Returns enriched objects: {tag, qualifier, rawAfterTag, value, derived}
+//  Pattern  :TAG::QUALIFIER//VALUE  or  :TAG:/QUALIFIER/VALUE
+// ══════════════════════════════════════════════════════════════════
+function parseSwift(raw){
+  const tags=[]; const lines=(raw||'').split(/\r?\n/);
+  let cur=null,val=[];
+  for(const ln of lines){
+    const m=ln.match(/^:(\d{1,3}[A-Z]?):(.*)$/);
+    if(m){if(cur)tags.push(buildTag(cur,val.join('\n').trim()));cur=m[1];val=[m[2]];}
+    else if(cur&&ln.trim())val.push(ln);
+  }
+  if(cur)tags.push(buildTag(cur,val.join('\n').trim()));
+  return tags;
+}
+
+function buildTag(tag,rawAfterTag){
+  let qualifier=null, value=rawAfterTag;
+  // Pattern 1: ::QUAL//value  (most common ISO 15022 pattern)
+  const m1=rawAfterTag.match(/^:([A-Z0-9]{4})\/\/([\s\S]*)$/);
+  if(m1){qualifier=m1[1];value=m1[2].trim();}
+  else{
+    // Pattern 2: /QUAL/value
+    const m2=rawAfterTag.match(/^\/([A-Z0-9]{4})\/\/([\s\S]*)$/);
+    if(m2){qualifier=m2[1];value=m2[2].trim();}
+  }
+  const derived=deriveValue(tag,qualifier,value,rawAfterTag);
+  return {tag,qualifier,rawAfterTag,value,derived};
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  VALUE DERIVATION ENGINE
+// ══════════════════════════════════════════════════════════════════
+function deriveValue(tag,qualifier,value,raw){
+  if(!value)return null;
+  // 1. Check trained custom derivation rules (highest priority)
+  const trained=derivRules.find(r=>r.tag===tag&&(r.qualifier===qualifier||r.qualifier==='*'||!r.qualifier));
+  if(trained)return applyFmt(trained.fmt,value,raw,trained.rx);
+  // 2. Trained per-tag+qualifier header overrides (check fmt)
+  const ovrKey=`${tag}|${qualifier||''}`;
+  const ovr=tagOverrides[ovrKey];
+  if(ovr&&ovr.fmt&&ovr.fmt!=='raw')return applyFmt(ovr.fmt,value,raw,ovr.rx);
+  // 3. Standard qualifier dictionary
+  const qi=qualifier&&QLOOKUP[tag]?QLOOKUP[tag][qualifier]:null;
+  if(qi&&qi.fmt&&qi.fmt!=='raw')return applyFmt(qi.fmt,value,raw,null);
+  return null; // null = no derivation, display raw value as-is
+}
+
+function applyFmt(fmt,value,raw,customRx){
+  try{
+    switch(fmt){
+      case 'date':    return fmtSwiftDate(value);
+      case 'datetime':return fmtSwiftDT(value);
+      case 'amount':  return fmtAmount(value);
+      case 'rate':    return fmtRate(value);
+      case 'quantity':return fmtQty(value);
+      case 'indicator':return fmtInd(value);
+      case 'party':   return value.replace(/\//g,' ').trim();
+      case 'split_slash':{const p=value.split('//');return p.length>1?p[1].trim():value;}
+      case 'custom':  return customRx?applyRx(value,customRx):value;
+      default:        return null;
+    }
+  }catch(e){return null;}
+}
+
+function fmtSwiftDate(v){
+  const m=v.match(/(\d{4})(\d{2})(\d{2})/);
+  if(!m)return v;
+  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${m[3]} ${mn[parseInt(m[2])-1]} ${m[1]}`;
+}
+function fmtSwiftDT(v){
+  const m=v.match(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/);
+  if(!m)return fmtSwiftDate(v);
+  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${m[3]} ${mn[parseInt(m[2])-1]} ${m[1]} ${m[4]}:${m[5]}`;
+}
+function fmtAmount(v){
+  const m=v.match(/([A-Z]{3})([\d,.-]+)/);
+  if(!m)return v;
+  const n=parseFloat(m[2].replace(/,/g,'.'))||0;
+  return `${m[1]} ${n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:4})}`;
+}
+function fmtRate(v){
+  const m=v.match(/([NPnp])?([\d.]+),?/);
+  if(!m)return v;
+  const sign=m[1]&&m[1].toUpperCase()==='P'?'+':'−';
+  return `${sign}${parseFloat(m[2]).toFixed(4)}`;
+}
+function fmtQty(v){
+  const m=v.match(/([A-Z]+)\/([\d,.]+)/);
+  if(!m)return v;
+  const n=parseFloat(m[2].replace(/,/g,'.'))||0;
+  const t={UNIT:'units',FAMT:'(face amt)',AMOR:'(amort. face)',PIEC:'pcs'}[m[1]]||m[1];
+  return `${n.toLocaleString('en-GB')} ${t}`;
+}
+function fmtInd(v){
+  const code=v.trim().split(/[/\s]/)[0];
+  return INDS[code]?`${code} — ${INDS[code]}`:v;
+}
+function applyRx(v,rxStr){
+  const m=rxStr.match(/^\/(.+)\/([gimu]*)\s*[→>]\s*(.+)$/);
+  if(!m)return v;
+  const re=new RegExp(m[1],m[2]);
+  return v.replace(re,m[3].replace(/\$(\d)/g,(_, n)=>`$${n}`));
+}
+
+// Format badge CSS class
+function fmtClass(fmt){
+  return {'date':'q-fmt-date','datetime':'q-fmt-date','amount':'q-fmt-amount','rate':'q-fmt-rate','indicator':'q-fmt-indicator','quantity':'q-fmt-qty'}[fmt]||'';
+}
+
+// Resolve final label / header / format for a tag+qualifier, with overrides
+function resolveQ(tag,qualifier){
+  const ovrKey=`${tag}|${qualifier||''}`;
+  const ovr=tagOverrides[ovrKey];
+  if(ovr&&ovr.header){
+    return{l:ovr.label||QLOOKUP[tag]?.[qualifier]?.l||TAGS[tag]?.l||tag, h:ovr.header, fmt:ovr.fmt||'raw', trained:true};
+  }
+  const qi=qualifier&&QLOOKUP[tag]?QLOOKUP[tag][qualifier]:null;
+  const ti=TAGS[tag]||{l:tag,h:'Other'};
+  return{l:qi?.l||ti.l, h:qi?.h||ti.h, fmt:qi?.fmt||'raw', trained:false};
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════════════════
+const uid=(pfx='')=>pfx+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase();
+const fmtDate=d=>d?new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'-';
+const fmtDT=d=>d?new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
+const swDate=(off=0)=>{const d=new Date();d.setDate(d.getDate()+off);return d.toISOString().slice(0,10).replace(/-/g,'');};
+const escH=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function getTagVal(tags,tag,qualifier){
+  for(const t of tags){
+    if(t.tag!==tag)continue;
+    if(!qualifier)return t.value;
+    if(t.qualifier===qualifier)return t.value;
+  }
+  return null;
+}
+function extractCARef(tags){return getTagVal(tags,'20C','CORP')||getTagVal(tags,'20C','CANO')||getTagVal(tags,'20C',null)||null;}
+function extractISIN(tags){const v=getTagVal(tags,'35B',null)||'';const m=v.match(/ISIN\s+([A-Z]{2}[A-Z0-9]{10})/);return m?m[1]:null;}
+function extractEvType(tags){return getTagVal(tags,'22F','CAEV')||'UNKN';}
+function extractStatus(tags){const v=getTagVal(tags,'25D','PROC')||getTagVal(tags,'25D','CONF')||'';if(v.includes('CONF'))return'CONFIRMED';return'PENDING';}
+function detectType(raw,tags){const fn=getTagVal(tags,'23G',null)||'';if(fn==='CONF')return'MT566';if(raw.includes(':22H:'))return'MT565';return'MT564';}
+
+// Extract safekeeping account (97A::SAFE) from tags
+function extractSafeAccount(tags){return getTagVal(tags,'97A','SAFE')||null;}
+
+// Get eligible quantity (93B::ELIG or 36B::ELIG) as a number
+function extractEligQty(tags){
+  const v=getTagVal(tags,'93B','ELIG')||getTagVal(tags,'36B','ELIG')||'';
+  const m=v.match(/\/?([\d,]+)/);
+  return m?parseInt(m[1].replace(/,/g,'')):0;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  MESSAGE RETRIEVAL by Ref / Safe Account / Type
+// ══════════════════════════════════════════════════════════════════
+function retrieveMessages(){
+  const ref=(document.getElementById('ret-ref')?.value||'').trim().toUpperCase();
+  const safe=(document.getElementById('ret-safe')?.value||'').trim().toUpperCase();
+  const type=document.getElementById('ret-type')?.value||'';
+  const isin=(document.getElementById('ret-isin')?.value||'').trim().toUpperCase();
+
+  if(!ref&&!safe&&!type&&!isin){
+    document.getElementById('ret-results').innerHTML='<div class="ret-none"><div class="ret-icon">🔍</div><div>Enter at least one search criterion above</div></div>';
+    return;
+  }
+  const results=msgs.filter(m=>{
+    const msgRef=(m.caRef||m.id||'').toUpperCase();
+    const msgSafe=(getTagVal(m.tags||[],'97A','SAFE')||'').toUpperCase();
+    const msgType=m.type;
+    const msgIsin=(m.isin||'').toUpperCase();
+    const refOk=!ref||(msgRef.includes(ref)||m.id.toUpperCase().includes(ref));
+    const safeOk=!safe||msgSafe.includes(safe);
+    const typeOk=!type||msgType===type;
+    const isinOk=!isin||msgIsin.includes(isin);
+    return refOk&&safeOk&&typeOk&&isinOk;
+  });
+
+  const container=document.getElementById('ret-results');
+  if(!results.length){
+    container.innerHTML='<div class="ret-none"><div class="ret-icon">📭</div><div>No messages match the criteria</div><div style="font-size:10px;margin-top:4px;color:var(--tx3)">Try broadening your search — partial values are supported</div></div>';
+    return;
+  }
+  container.innerHTML=results.map(m=>{
+    const bc=m.type==='MT564'?'r564':m.type==='MT565'?'r565':'r566';
+    const sc=m.status==='CONFIRMED'?'stp-c':m.status==='ELECTED'?'stp-e':'stp-p';
+    const safe=getTagVal(m.tags||[],'97A','SAFE')||'—';
+    const elig=extractEligQty(m.tags||[]);
+    return`<div class="ret-card ${bc}" onclick="selectMsg('${m.id}');switchTab('viewer')">
+      <div class="ret-card-top">
+        <span class="mtb ${m.type==='MT564'?'b564':m.type==='MT565'?'b565':'b566'}">${m.type}</span>
+        <span style="font-family:var(--mono);font-size:11px;font-weight:600">${escH(m.caRef||m.id)}</span>
+        <span class="stp ${sc}">${m.status}</span>
+        <span style="margin-left:auto;font-size:9px;color:var(--tx3)">${fmtDate(m.date)}</span>
+      </div>
+      <div class="ret-card-fields">
+        <div class="ret-cf"><span>ISIN:</span> ${escH(m.isin||'—')}</div>
+        <div class="ret-cf"><span>Event:</span> ${escH(m.evType||'—')}</div>
+        <div class="ret-cf"><span>Safe Acct:</span> ${escH(safe)}</div>
+        ${elig?`<div class="ret-cf"><span>Elig Qty:</span> ${elig.toLocaleString()} units</div>`:''}
+        ${m.rate?`<div class="ret-cf"><span>Rate:</span> ${m.rate}</div>`:''}
+        ${m.entl?`<div class="ret-cf"><span>Entitlement:</span> USD ${m.entl.toFixed(2)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('ret-count').textContent=`${results.length} result${results.length!==1?'s':''}`;
+}
+
+function clearRetrieval(){
+  ['ret-ref','ret-safe','ret-isin'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const sel=document.getElementById('ret-type');if(sel)sel.value='';
+  document.getElementById('ret-results').innerHTML='<div class="ret-none"><div class="ret-icon">🔍</div><div>Enter search criteria and click Retrieve</div></div>';
+  document.getElementById('ret-count').textContent='';
+}
+
+function renderRetrieve(){
+  const p=document.getElementById('p-retrieve');
+  p.innerHTML=`
+    <div class="ret-form">
+      <h4>🔍 Message Retrieval <span style="font-size:9px;font-weight:400;color:var(--tx3)">— find messages by reference, safekeeping account, or type</span></h4>
+      <div class="ret-grid">
+        <div class="ret-field">
+          <label>Message / CA Reference</label>
+          <input id="ret-ref" placeholder="e.g. CA1A2B3C or MSG..." oninput="autoRetrieve()">
+        </div>
+        <div class="ret-field">
+          <label>Safekeeping Account (97A::SAFE)</label>
+          <input id="ret-safe" placeholder="e.g. ACCT1234567" oninput="autoRetrieve()">
+        </div>
+        <div class="ret-field">
+          <label>ISIN (35B)</label>
+          <input id="ret-isin" placeholder="e.g. GB000263..." oninput="autoRetrieve()">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="ret-field" style="flex:1">
+          <label>Message Type</label>
+          <select id="ret-type" onchange="retrieveMessages()">
+            <option value="">— All Types —</option>
+            <option value="MT564">MT564 — CA Notification</option>
+            <option value="MT565">MT565 — Election</option>
+            <option value="MT566">MT566 — Confirmation</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:14px">
+          <button class="ib pri" onclick="retrieveMessages()" style="padding:6px 14px">🔍 Retrieve</button>
+          <button class="ib" onclick="clearRetrieval()">✕ Clear</button>
+        </div>
+        <div style="margin-top:14px;font-size:10px;color:var(--teal);font-family:var(--mono)" id="ret-count"></div>
+      </div>
+    </div>
+    <div id="ret-results"><div class="ret-none"><div class="ret-icon">🔍</div><div>Enter search criteria and click Retrieve</div></div></div>
+  `;
+}
+let _retTimer=null;
+function autoRetrieve(){clearTimeout(_retTimer);_retTimer=setTimeout(retrieveMessages,350);}
+
+// ══════════════════════════════════════════════════════════════════
+//  SAMPLE DATA GENERATORS
+// ══════════════════════════════════════════════════════════════════
+const ISINS=['GB0002634946','US0378331005','DE0005140008','FR0000131104','GB00B03MLX29','JP3633400001','CH0012221716'];
+const CORPS=['Barclays PLC','Apple Inc','Deutsche Bank AG','BNP Paribas SA','BP PLC','SoftBank Group','ABB Ltd'];
+const EVTS=Object.keys(CAEV);
+
+function rawMT564(caRef,ev,isin,corp,rate){
+  return[':16R:GENL',`:20C::CORP//${caRef}`,`:20C::CANO//${uid('EV')}`,':23G:NEWM',
+    `:22F::CAEV//${ev}`,':22F::CAMV//MAND',`:98C::PREP//${swDate()}120000`,':25D::PROC//ENTL',':16S:GENL',
+    ':16R:USECU',`:35B:ISIN ${isin}`,`//  ${corp}`,`:93B::ELIG//UNIT/${Math.floor(Math.random()*2e6+5e4)},`,':16S:USECU',
+    ':16R:CADETL',`:98A::RDDT//${swDate(10)}`,`:98A::EXDT//${swDate(5)}`,`:98A::PAYD//${swDate(20)}`,
+    ':22F::DIST//CASH',':22F::ADDB//COND',`:92A::TAXR//N15,`,`:92A::GRSS//N${(rate*1.15).toFixed(4)}`,`:92A::NETT//N${rate.toFixed(4)}`,':16S:CADETL',
+    ':16R:CAOPTN',':13A::CAON//001',':22F::CAOP//CASH',':11A::DENO//USD',
+    `:19A::ENTL//USD${rate.toFixed(4)}`,`:19A::GRSS//USD${(rate*1.15).toFixed(4)}`,':16S:CAOPTN',
+    ':16R:ADDINFO',`:70E::ADTX//Corporate Action ${ev} notification for ${isin}`,':16S:ADDINFO'].join('\n');
+}
+function rawMT565(caRef,ev,isin,corp,qty,caon,caop,safe){
+caon = caon||'001'
+caop = caop||'CASH'
+safe = safe||'ACCT1234'
+  return[':16R:GENL',`:20C::CORP//${caRef}`,`:20C::INST//${uid('EL')}`,`:20C::MASE//${uid('MA')}`,
+    ':23G:NEWM',`:22F::CAEV//${ev}`,`:98C::SETT//${swDate(3)}120000`,':16S:GENL',
+    ':16R:USECU',`:35B:ISIN ${isin}`,`//  ${corp}`,`:36B::ELIG//UNIT/${qty},`,':16S:USECU',
+    ':16R:CAOPTN',`:13A::CAON//${caon}`,`:22H::CAOP//${caop}`,':11A::DENO//USD',
+    `:97A::SAFE//${safe}`,':16S:CAOPTN'].join('\n');
+}
+function rawMT566(caRef,ev,isin,corp,entl){
+  return[':16R:GENL',`:20C::CORP//${caRef}`,`:20C::CONF//${uid('CF')}`,
+    ':23G:CONF',`:22F::CAEV//${ev}`,':25D::PROC//CONF',`:98C::CONF//${swDate()}120000`,':16S:GENL',
+    ':16R:USECU',`:35B:ISIN ${isin}`,`//  ${corp}`,`:93B::ELIG//UNIT/${Math.floor(Math.random()*2e5+1e4)},`,':16S:USECU',
+    ':16R:CAOPTN',':13A::CAON//001',':22H::CAOP//CASH',
+    `:19A::ENTL//USD${entl.toFixed(2)}`,`:19A::GRSS//USD${(entl*1.15).toFixed(2)}`,`:19A::NETT//USD${entl.toFixed(2)}`,
+    ':92A::TAXR//N15,',`:98A::PAYD//${swDate(2)}`,`:97A::SAFE//ACCT${Math.floor(Math.random()*9e6+1e6)}`,':16S:CAOPTN'].join('\n');
+}
+
+function mkMT564(opts={}){
+  const i=Math.floor(Math.random()*ISINS.length);
+  const caRef=uid('CA'),ev=opts.ev||EVTS[Math.floor(Math.random()*EVTS.length)];
+  const isin=opts.isin||ISINS[i],corp=CORPS[i],rate=+(Math.random()*3+0.2).toFixed(4);
+  const raw=rawMT564(caRef,ev,isin,corp,rate);const tags=parseSwift(raw);
+  return{id:uid('MSG'),type:'MT564',caRef,isin,corp,evType:ev,status:'PENDING',date:new Date().toISOString(),raw,tags,notes:'',rate,linkedTo:null};
+}
+function mkMT565(p){
+const caon='001';
+const caop='CASH';
+const safe='ACCT1234';
+  
+const qty=Math.floor(Math.random()*1e5+1e4);const raw=rawMT565(p.caRef,p.evType,p.isin,p.corp,qty,caon,caop,safe);const tags=parseSwift(raw);
+  return{id:uid('MSG'),type:'MT565',caRef:p.caRef,isin:p.isin,corp:p.corp,evType:p.evType,status:'ELECTED',date:new Date().toISOString(),raw,tags,notes:'',qty,electedOption:'CASH',linkedTo:p.id};
+}
+function mkMT566(p5){
+  const entl=+(Math.random()*5e4+5e3).toFixed(2);const raw=rawMT566(p5.caRef,p5.evType,p5.isin,p5.corp,entl);const tags=parseSwift(raw);
+  return{id:uid('MSG'),type:'MT566',caRef:p5.caRef,isin:p5.isin,corp:p5.corp,evType:p5.evType,status:'CONFIRMED',date:new Date().toISOString(),raw,tags,notes:'',entl,linkedTo:p5.id};
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CRUD
+// ══════════════════════════════════════════════════════════════════
+async function saveMsg(m){msgs.push(m);await dbPut('messages',m);renderList();updateStats();}
+async function genS564(){const m=mkMT564();await saveMsg(m);selectMsg(m.id);toast('MT564 generated: '+m.caRef,'ok');addBot(`📨 MT564 created:\n• CA Ref: **${m.caRef}**\n• Event: **${m.evType}** — ${CAEV[m.evType]||''}\n• ISIN: \`${m.isin}\`\n• Rate: **${m.rate}**\n\nAll tags parsed with qualifier extraction. View "Detail" to inspect.`,['Show qualifiers','Elect options','View raw']);}
+async function genS565(){const ps=msgs.filter(m=>m.type==='MT564');if(!ps.length){toast('No MT564 — generating first','info');await genS564();return;}const p=ps[Math.floor(Math.random()*ps.length)];const m=mkMT565(p);await saveMsg(m);selectMsg(m.id);toast('MT565 generated: '+m.id,'ok');addBot(`⚡ MT565 election raised:\n• Ref: \`${m.id}\`\n• Option (22H::CAOP): **CASH**\n• Qty (36B::ELIG): **${m.qty?.toLocaleString()} units**\n\nGo to "Generate MT566" to confirm.`,['Generate MT566']);}
+async function genBulk(){for(let i=0;i<5;i++){const m4=mkMT564();await saveMsg(m4);if(Math.random()>.3){const m5=mkMT565(m4);await saveMsg(m5);if(Math.random()>.4){const m6=mkMT566(m5);await saveMsg(m6);}}}toast('Generated 5 event chains (MT564→565→566)','ok');}
+async function delMsg(id){if(!confirm('Delete this message?'))return;msgs=msgs.filter(m=>m.id!==id);await dbDel('messages',id);if(selId===id){selId=null;document.getElementById('p-viewer').innerHTML='<div class="empty-st"><div class="empty-icon">📋</div><div>Select a message</div></div>';}renderList();updateStats();toast('Deleted','info');}
+async function clearAll(){if(!confirm('Clear ALL messages from database?'))return;await dbClear('messages');msgs=[];selId=null;document.getElementById('p-viewer').innerHTML='<div class="empty-st"><div>Database cleared</div></div>';renderList();updateStats();toast('Database cleared','info');}
+
+// ══════════════════════════════════════════════════════════════════
+//  LIST + FILTER
+// ══════════════════════════════════════════════════════════════════
+function setF(f,el){curFilter=f;document.querySelectorAll('.fc').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderList();}
+function renderList(){
+  const srch=(document.getElementById('s-in').value||'').toLowerCase();
+  const pat=document.getElementById('s-pat').value.trim();
+  let re=null;try{if(pat)re=new RegExp(pat,'i');}catch(e){}
+  const filtered=msgs.filter(m=>{
+    const typeOk=curFilter==='all'||(curFilter==='564'&&m.type==='MT564')||(curFilter==='565'&&m.type==='MT565')||(curFilter==='566'&&m.type==='MT566')||m.status?.toLowerCase()===curFilter;
+    // Include qualifier and derived values in searchable hay
+    const qhay=(m.tags||[]).map(t=>`${t.qualifier||''} ${t.value||''} ${t.derived||''}`).join(' ');
+    const hay=[m.id,m.caRef,m.isin,m.evType,m.corp,m.type,m.status,qhay].join(' ').toLowerCase();
+    return typeOk&&(!srch||hay.includes(srch))&&(!re||re.test(m.raw||hay));
+  }).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('ml');
+  if(!filtered.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:11px">No messages match</div>';return;}
+  el.innerHTML=filtered.map(m=>{
+    const sc=m.status==='CONFIRMED'?'stp-c':m.status==='ELECTED'?'stp-e':'stp-p';
+    const bc=m.type==='MT564'?'b564':m.type==='MT565'?'b565':'b566';
+    return`<div class="mi${m.id===selId?' sel':''}" onclick="selectMsg('${m.id}')"><div class="mi-top"><span class="mtb ${bc}">${m.type}</span><span class="stp ${sc}">${m.status}</span><span class="mi-dt">${fmtDate(m.date)}</span></div><div class="mi-ref">${escH(m.caRef||m.id)}</div><div class="mi-sub">${escH(m.evType||'')} · ${escH(m.isin||'')} · ${escH((m.corp||'').slice(0,20))}</div></div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SELECT + TAB ROUTING
+// ══════════════════════════════════════════════════════════════════
+function selectMsg(id){
+  selId=id;renderList();
+  const msg=msgs.find(m=>m.id===id);if(!msg)return;
+  const map={'p-viewer':renderViewer,'p-options':renderOptions,'p-gen566':renderGen566,'p-related':renderRelated,'p-raw':renderRaw};
+  const cur=document.querySelector('.panel.show');
+  if(cur&&map[cur.id])map[cur.id](msg);
+}
+function switchTab(tab){
+  curTab=tab;
+  const tabs=['viewer','options','gen566','related','raw','retrieve'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  document.getElementById('p-'+tab)?.classList.add('show');
+  if(selId){const msg=msgs.find(m=>m.id===selId);if(msg){if(tab==='viewer')renderViewer(msg);else if(tab==='options')renderOptions(msg);else if(tab==='gen566')renderGen566(msg);else if(tab==='related')renderRelated(msg);else if(tab==='raw')renderRaw(msg);}}
+  if(tab==='retrieve')renderRetrieve();
+}
+function switchView(view){
+  curView=view;
+  document.querySelectorAll('.ntab').forEach((t,i)=>t.classList.toggle('active',['messages','training','mq','export','analytics'][i]===view));
+  const tb=document.getElementById('tabs-bar');
+  if(view==='messages'){tb.style.display='flex';switchTab(curTab||'viewer');return;}
+  tb.style.display='none';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  const pm={training:'p-training',mq:'p-mq',export:'p-export',analytics:'p-analytics'};
+  if(pm[view])document.getElementById(pm[view])?.classList.add('show');
+  if(view==='training')renderTraining();
+  else if(view==='mq')renderMQ();
+  else if(view==='export')renderExport();
+  else if(view==='analytics')renderAnalytics();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  VIEWER — full qualifier-aware tag table
+// ══════════════════════════════════════════════════════════════════
+function renderViewer(msg){
+  const p=document.getElementById('p-viewer');
+  const grouped=groupTagsQ(msg.tags||[]);
+  const sc=msg.status==='CONFIRMED'?'conf':msg.status==='ELECTED'?'elec':'pend';
+  const tagCount=(msg.tags||[]).length;
+  const qualCount=(msg.tags||[]).filter(t=>t.qualifier).length;
+  const derivedCount=(msg.tags||[]).filter(t=>t.derived).length;
+  p.innerHTML=`
+    <div class="vh">
+      <div class="vh-title">${msg.type} · ${escH(msg.caRef||msg.id)}</div>
+      <span class="badge ${sc}">${msg.status}</span>
+      <span class="badge teal">${msg.evType} — ${CAEV[msg.evType]||''}</span>
+      <div class="vh-acts">
+        ${msg.type==='MT564'?`<button class="ib amb" onclick="switchTab('options')">⚡ Elect</button>`:''}
+        ${msg.type==='MT565'?`<button class="ib grn" onclick="doGen566('${msg.id}')">✓ MT566</button>`:''}
+        <button class="ib" onclick="switchTab('raw')">Raw</button>
+        <button class="ib red" onclick="delMsg('${msg.id}')">🗑</button>
+      </div>
+    </div>
+    <div class="mcs">
+      ${chip('ISIN',msg.isin,'var(--teal)')}${chip('Company',msg.corp)}${chip('Event',msg.evType)}${chip('CA Ref',msg.caRef)}${chip('Date',fmtDT(msg.date))}
+      ${msg.rate?chip('Rate',''+msg.rate,'var(--grn)'):''}${msg.qty?chip('Qty',(msg.qty||0).toLocaleString()):''}${msg.entl?chip('Entitlement','USD '+(msg.entl||0).toFixed(2),'var(--grn)'):''}
+      ${chip('Tags',''+tagCount)}${chip('With Qualifier',''+qualCount,'var(--coral)')}${chip('Derived',''+derivedCount,'var(--teal)')}
+    </div>
+    ${Object.entries(grouped).map(([hdr,rows])=>`
+      <div class="sc">
+        <div class="sc-hd">${escH(hdr)} <span style="font-weight:400;color:var(--tx3)">${rows.length} fields</span></div>
+        <table class="qtbl" style="width:100%">
+          <thead><tr>
+            <th style="width:52px">Tag</th>
+            <th style="width:72px">Qualifier</th>
+            <th style="min-width:120px">Field Label</th>
+            <th style="width:60px">Format</th>
+            <th>Derived / Parsed Value</th>
+            <th style="width:130px">Raw Value</th>
+            <th style="width:28px"></th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(r=>{
+              const fc=fmtClass(r.qinfo.fmt);
+              return`<tr>
+                <td><span class="q-tag">:${r.tag}:</span></td>
+                <td>${r.qualifier?`<span class="q-qual">${r.qualifier}</span>`:`<span class="q-qual none">—</span>`}</td>
+                <td>
+                  <div class="q-lbl">${escH(r.qinfo.l)}</div>
+                  ${r.qinfo.trained?`<div><span class="q-trained">✦ trained</span></div>`:''}
+                </td>
+                <td>${r.qinfo.fmt&&r.qinfo.fmt!=='raw'?`<span class="q-fmt-badge ${fc}">${r.qinfo.fmt}</span>`:`<span style="font-size:8px;color:var(--tx3)">raw</span>`}</td>
+                <td>
+                  ${r.derived
+                    ?`<div class="q-derived">${escH(r.derived)}</div><div class="q-raw">${escH(r.value).slice(0,55)}${r.value.length>55?'…':''}</div>`
+                    :`<div class="q-derived">${escH(r.value)}</div>`}
+                </td>
+                <td><span style="font-family:var(--mono);font-size:8px;color:var(--tx3);word-break:break-all">${escH(r.rawAfterTag).slice(0,45)}</span></td>
+                <td><span class="q-ovr" title="Override" onclick="openTagModal('${r.tag}','${escH(r.qualifier||'')}','${escH(r.qinfo.h)}')">✎</span></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `).join('')}
+  `;
+}
+
+function chip(lbl,val,col=''){if(!val&&val!==0)return'';return`<div class="mc"><span>${escH(lbl)}</span><span style="color:${col||'var(--tx)'};">${escH(String(val))}</span></div>`;}
+
+function groupTagsQ(tags){
+  const grouped={};
+  for(const t of tags){
+    const qinfo=resolveQ(t.tag,t.qualifier);
+    const hdr=qinfo.h;
+    if(!grouped[hdr])grouped[hdr]=[];
+    grouped[hdr].push({...t,qinfo});
+  }
+  return grouped;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  OPTIONS (MT565 ELECTION)
+// ══════════════════════════════════════════════════════════════════
+function renderOptions(msg){
+  const p=document.getElementById('p-options');
+  if(msg.type!=='MT564'){p.innerHTML='<div class="empty-st"><div>Options panel is for MT564 messages</div></div>';return;}
+  const linked=msgs.filter(m=>m.type==='MT565'&&m.caRef===msg.caRef);
+  const opts=[{code:'CASH',label:'Cash Payment',detail:'Receive cash entitlement'},{code:'SECU',label:'Securities',detail:'Receive additional securities'},{code:'DRIP',label:'Dividend Reinvestment',detail:'Reinvest proceeds into new shares'},{code:'NOPH',label:'No Action / Default',detail:'Accept issuer default treatment'}];
+  // Get eligible quantity from parent MT564 for validation display
+  const eligQty=extractEligQty(msg.tags||[]);
+  const alreadyElected=linked.reduce((a,m)=>a+(m.qty||0),0);
+  const remaining=Math.max(0,eligQty-alreadyElected);
+  const defaultQty=Math.min(remaining>0?remaining:eligQty>0?Math.floor(eligQty*0.5):50000, eligQty>0?eligQty:99999999);
+
+  p.innerHTML=`<div style="margin-bottom:12px"><h3 style="font-size:13px;font-weight:600">MT565 Election · ${escH(msg.caRef)}</h3><p style="font-size:10px;color:var(--tx2);margin-top:3px">22F::CAEV: <strong style="color:var(--amb)">${msg.evType}</strong> · 35B ISIN: <span style="font-family:var(--mono);color:var(--teal)">${escH(msg.isin)}</span>${eligQty>0?` · 93B::ELIG: <strong style="color:var(--grn)">${eligQty.toLocaleString()} units</strong>`:''}</p></div>
+  ${eligQty>0?`<div style="padding:8px 12px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rad);margin-bottom:10px;font-size:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center"><span style="color:var(--tx2)">MT564 Eligible Balance (93B::ELIG):</span><strong style="color:var(--grn);font-family:var(--mono)">${eligQty.toLocaleString()} units</strong><span style="color:var(--tx3)">|</span><span style="color:var(--tx2)">Already Elected:</span><strong style="color:var(--amb);font-family:var(--mono)">${alreadyElected.toLocaleString()} units</strong><span style="color:var(--tx3)">|</span><span style="color:var(--tx2)">Remaining:</span><strong style="color:var(--teal);font-family:var(--mono)">${remaining.toLocaleString()} units</strong></div>`:''}
+  <div class="opt-grid"><div class="oc"><h4>Available Options (22H::CAOP)</h4>
+  ${opts.map((o,i)=>`<div class="ropt${i===0?' sel':''}" onclick="pickOpt(this,'${o.code}')"><input type="radio" name="caopt" value="${o.code}" ${i===0?'checked':''} style="accent-color:var(--grn)"><div><div style="font-size:11px">${o.label}</div><div style="font-size:9px;color:var(--tx2)">${o.detail}</div></div>${i===0?`<span style="margin-left:auto;font-size:9px;color:var(--grn)">✓ Default</span>`:''}</div>`).join('')}
+  <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:9px"><h4 style="margin-bottom:8px">Election Parameters</h4>
+  <div class="or"><label>97A::SAFE (Account)</label><input type="text" id="el-acct" value="ACCT1234"></div>
+  <div class="or" style="flex-direction:column;align-items:stretch;gap:4px">
+    <div style="display:flex;gap:8px;align-items:center"><label style="min-width:95px">36B::ELIG (Quantity)</label><input type="number" id="el-qty" value="${defaultQty}" min="1" ${eligQty>0?`max="${eligQty}"`:''}  oninput="validateElectionQty('${msg.id}')" style="flex:1"></div>
+    ${eligQty>0?`<div class="qty-bar"><div class="qty-bar-fill" id="qty-bar-fill" style="width:${Math.round(defaultQty/eligQty*100)}%;background:var(--grn)"></div></div>`:''}
+  </div>
+  <div id="qty-validation" style="margin-top:4px"></div>
+  <div class="or"><label>13A::CAON (Option No.)</label><select id="el-caon"><option>001</option><option>002</option><option>003</option></select></div>
+  <div class="or"><label>13A::CAOP (Option)</label><select id="el-caop"><option>CASH</option><option>SECU</option><option>LAPS</option><option>NOAC</option></select></div>
+  <div class="or"><label>11A::DENO (Currency)</label><select id="el-ccy"><option>USD</option><option>GBP</option><option>EUR</option></select></div>
+  <div class="or"><label>98C::SETT (Date)</label><input type="date" id="el-sdt" value="${new Date(Date.now()+3*864e5).toISOString().slice(0,10)}"></div>
+  <button class="ib grn" style="width:100%;margin-top:8px;padding:7px" onclick="submitElection('${msg.id}')">Submit MT565 Election</button></div></div>
+  <div class="oc"><h4>Elected MT565s (${linked.length})</h4>
+  ${linked.length?linked.map(m=>`<div style="padding:6px 8px;background:var(--bg3);border-radius:5px;margin-bottom:5px;cursor:pointer" onclick="selectMsg('${m.id}')"><div style="display:flex;gap:6px;align-items:center"><span class="mtb b565">MT565</span><span style="font-family:var(--mono);font-size:10px">${m.id}</span><span style="margin-left:auto;font-size:9px;color:var(--grn)">${m.electedOption}</span></div><div style="font-size:9px;color:var(--tx2);margin-top:2px">36B::ELIG: ${(m.qty||0).toLocaleString()} units · ${fmtDate(m.date)}</div></div>`).join(''):'<div style="font-size:10px;color:var(--tx3)">No elections yet</div>'}
+  <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:9px">
+    <div style="font-size:10px;color:var(--tx2);margin-bottom:4px">Total Elected: <strong style="color:var(--grn)">${alreadyElected.toLocaleString()} units</strong></div>
+    ${eligQty>0?`<div style="font-size:10px;color:var(--tx2)">Eligible Balance: <strong style="color:var(--teal)">${eligQty.toLocaleString()} units</strong></div>
+    <div class="qty-bar" style="margin-top:6px"><div class="qty-bar-fill" style="width:${Math.min(100,Math.round(alreadyElected/eligQty*100))}%;background:var(--pur)"></div></div>
+    <div style="font-size:9px;color:var(--tx3);margin-top:2px">${Math.min(100,Math.round(alreadyElected/eligQty*100))}% of eligible balance utilised</div>`:''}
+  </div></div></div>`;
+  // Trigger initial validation display
+  setTimeout(()=>validateElectionQty('${msg.id}'),50);
+}
+function pickOpt(el){document.querySelectorAll('.ropt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');el.querySelector('input').checked=true;}
+
+// Live quantity validation — compare against MT564 eligible balance (93B::ELIG)
+function validateElectionQty(parentId){
+  const p=msgs.find(m=>m.id===parentId);if(!p)return;
+  const eligQty=extractEligQty(p.tags||[]);
+  const enteredQty=parseInt(document.getElementById('el-qty')?.value)||0;
+  const container=document.getElementById('qty-validation');
+  const bar=document.getElementById('qty-bar-fill');
+  if(!container)return;
+  if(eligQty<=0){container.innerHTML='<div class="val-warn"><span>⚠</span>MT564 eligible quantity (93B::ELIG) could not be determined — proceeding without limit check.</div>';return;}
+  const pct=Math.min(100,Math.round(enteredQty/eligQty*100));
+  const used=msgs.filter(m=>m.type==='MT565'&&m.caRef===p.caRef).reduce((a,m)=>a+(m.qty||0),0);
+  const remaining=eligQty-used;
+  if(enteredQty<=0){container.innerHTML=`<div class="val-err"><span>✕</span>Quantity must be greater than zero.</div>`;if(bar)bar.style.cssText='width:0%;background:var(--red)';return;}
+  if(enteredQty>eligQty){container.innerHTML=`<div class="val-err"><span>✕</span><div>Elected quantity <strong>${enteredQty.toLocaleString()}</strong> exceeds MT564 eligible balance <strong>${eligQty.toLocaleString()} units</strong> (93B::ELIG). Reduce quantity to proceed.</div></div>`;if(bar){bar.style.width='100%';bar.style.background='var(--red)';}return;}
+  if(enteredQty>remaining&&used>0){container.innerHTML=`<div class="val-warn"><span>⚠</span><div>Quantity <strong>${enteredQty.toLocaleString()}</strong> exceeds remaining balance <strong>${remaining.toLocaleString()}</strong> units (${used.toLocaleString()} already elected).</div></div>`;if(bar){bar.style.width=pct+'%';bar.style.background='var(--amb)';}return;}
+  const col=pct>80?'var(--amb)':pct>50?'var(--blue)':'var(--grn)';
+  container.innerHTML=`<div class="val-ok"><span>✓</span><div>Valid: <strong>${enteredQty.toLocaleString()}</strong> of <strong>${eligQty.toLocaleString()}</strong> eligible units (${pct}%). Remaining: <strong>${(eligQty-used-enteredQty).toLocaleString()}</strong> units.</div></div>`;
+  if(bar){bar.style.width=pct+'%';bar.style.background=col;}
+}
+
+async function submitElection(pid){
+  const p=msgs.find(m=>m.id===pid);if(!p)return;
+  const eligQty=extractEligQty(p.tags||[]);
+  const enteredQty=parseInt(document.getElementById('el-qty')?.value)||0;
+  // VALIDATION: qty must be > 0 and <= eligible quantity
+  if(enteredQty<=0){toast('Quantity must be greater than zero','err');return;}
+  if(eligQty>0&&enteredQty>eligQty){toast(`Qty ${enteredQty.toLocaleString()} exceeds MT564 eligible balance of ${eligQty.toLocaleString()} units`,'err');addBot(`❌ Election blocked: entered quantity **${enteredQty.toLocaleString()}** exceeds the MT564 eligible balance of **${eligQty.toLocaleString()} units** (tag 93B::ELIG).\n\nPlease reduce the quantity and resubmit.`);return;}
+  const m5=mkMT565(p);
+  m5.caon=document.getElementById('el-caon')?.value||'001';
+  m5.caop=document.getElementById('el-caop')?.value||'CASH';
+  m5.safe=document.getElementById('el-acct')?.value||'ACCT1234';
+  m5.electedOption=document.getElementById('el-caop')?.value||'CASH';
+  m5.qty=enteredQty;
+  m5.raw=rawMT565(p.caRef,p.evType,p.isin,p.corp,m5.qty,m5.caon,m5.caop,m5.safe);m5.tags=parseSwift(m5.raw);
+  await saveMsg(m5);selectMsg(m5.id);toast('MT565 submitted: '+m5.id,'ok');
+  const pct=eligQty>0?Math.round(m5.qty/eligQty*100):0;
+  addBot(`✅ MT565 submitted (qty validated):\n• Ref: \`${m5.id}\`\n• 22H::CAOP: **${m5.electedOption}**\n• 36B::ELIG: **${m5.qty.toLocaleString()} units** (${pct}% of eligible balance)\n• 93B::ELIG limit: **${eligQty.toLocaleString()} units**\n\nGo to "Generate MT566" to confirm.`,['Generate MT566']);
+}
+
+// ════════════════════════════════ ══════════════════════════════════
+//  GEN566
+// ══════════════════════════════════════════════════════════════════
+function renderGen566(msg){
+  const p=document.getElementById('p-gen566');
+  if(msg.type!=='MT565'){const a=msgs.filter(m=>m.type==='MT565'&&m.caRef===msg.caRef);if(a.length){renderGen566(a[0]);return;}p.innerHTML='<div class="empty-st"><div>Select an MT565 to confirm</div></div>';return;}
+  const ex=msgs.filter(m=>m.type==='MT566'&&m.caRef===msg.caRef);
+  p.innerHTML=`<h3 style="font-size:13px;font-weight:600;margin-bottom:12px">Generate MT566 · ${escH(msg.caRef)}</h3>
+  <div class="opt-grid"><div class="oc"><h4>Source MT565 Fields</h4>
+  ${[['20C::INST',msg.id],['20C::CORP',msg.caRef],['22H::CAOP',msg.electedOption||'CASH'],['36B::ELIG',(msg.qty||0).toLocaleString()+' units'],['35B ISIN',msg.isin],['22F::CAEV',msg.evType]].map(([l,v])=>`<div style="display:flex;gap:8px;margin-bottom:5px;font-size:10px"><span style="color:var(--coral);font-family:var(--mono);min-width:90px">${l}</span><span style="font-family:var(--mono);color:var(--tx)">${escH(v)}</span></div>`).join('')}
+  <div style="border-top:1px solid var(--bd);padding-top:9px;margin-top:9px"><h4 style="margin-bottom:8px">MT566 Output Tags</h4>
+  <div class="or"><label>19A::ENTL (USD)</label><input type="number" id="g-entl" value="${(Math.random()*3e4+5e3).toFixed(2)}" step="0.01"></div>
+  <div class="or"><label>19A::GRSS (USD)</label><input type="number" id="g-grss" value="${(Math.random()*35e3+6e3).toFixed(2)}" step="0.01"></div>
+  <div class="or"><label>92A::TAXR (%)</label><input type="number" id="g-tax" value="15" step="0.1"></div>
+  <div class="or"><label>11A::DENO</label><select id="g-ccy"><option>USD</option><option>GBP</option><option>EUR</option></select></div>
+  <div class="or"><label>98A::PAYD</label><input type="date" id="g-vdate" value="${new Date(Date.now()+2*864e5).toISOString().slice(0,10)}"></div>
+  <div class="or"><label>25D::PROC</label><select id="g-sts"><option value="CONF">CONF — Confirmed</option><option value="PEND">PEND — Pending</option></select></div>
+  <button class="ib grn" style="width:100%;padding:7px;margin-top:8px" onclick="doGen566('${msg.id}')">✓ Generate &amp; Store MT566</button></div></div>
+  <div class="oc"><h4>Existing Confirmations (${ex.length})</h4>
+  ${ex.map(m=>`<div style="padding:6px 8px;background:var(--bg3);border-radius:5px;margin-bottom:5px;cursor:pointer" onclick="selectMsg('${m.id}')"><span class="mtb b566">MT566</span> <span style="font-family:var(--mono);font-size:9px">${m.id}</span><div style="font-size:9px;color:var(--grn);margin-top:2px">19A::ENTL USD ${(m.entl||0).toFixed(2)} · ${fmtDate(m.date)}</div></div>`).join('')||'<div style="font-size:10px;color:var(--tx3)">None yet</div>'}
+  <div style="margin-top:10px"><h4 style="margin-bottom:5px;font-size:10px">Preview</h4><pre id="g-prev" style="font-family:var(--mono);font-size:9px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;background:var(--bg3);border-radius:4px;padding:8px;max-height:200px;overflow-y:auto">Click Generate…</pre></div></div></div>`;
+}
+async function doGen566(id5){
+  const m5=msgs.find(m=>m.id===id5);
+  if(!m5||m5.type!=='MT565'){const a=msgs.filter(m=>m.type==='MT565'&&selId&&msgs.find(x=>x.id===selId)?.caRef===m.caRef);if(a.length)return doGen566(a[0].id);toast('No MT565 selected','err');return;}
+  const entl=parseFloat(document.getElementById('g-entl')?.value)||+(Math.random()*2e4+5e3).toFixed(2);
+  const m6=mkMT566(m5);m6.entl=entl;m6.raw=rawMT566(m5.caRef,m5.evType,m5.isin,m5.corp,entl);m6.tags=parseSwift(m6.raw);
+  m5.status='CONFIRMED';await dbPut('messages',m5);
+  await saveMsg(m6);
+  const pv=document.getElementById('g-prev');if(pv)pv.textContent=m6.raw;
+  selectMsg(m6.id);toast('MT566 generated: '+m6.id,'ok');
+  addBot(`✅ MT566 confirmation stored:\n• 20C::CONF: \`${m6.id}\`\n• 19A::ENTL: **USD ${entl.toLocaleString()}**\n• 25D::PROC: **CONF**\n\nAll three messages in the event chain are now stored.`);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  RELATED + RAW
+// ══════════════════════════════════════════════════════════════════
+function renderRelated(msg){
+  const p=document.getElementById('p-related');
+  const rel=msgs.filter(m=>m.caRef===msg.caRef&&m.id!==msg.id).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const chain=[...new Set([msg,...rel].sort((a,b)=>new Date(a.date)-new Date(b.date)).map(m=>m.type))];
+  p.innerHTML=`<h3 style="font-size:13px;font-weight:600;margin-bottom:12px">Event Chain · ${escH(msg.caRef)}</h3>
+  <div class="sc" style="margin-bottom:10px"><div class="sc-hd">Message Chain</div><div style="padding:12px;display:flex;align-items:center;gap:5px;flex-wrap:wrap">${chain.map((t,i)=>`<span class="mtb ${t==='MT564'?'b564':t==='MT565'?'b565':'b566'}" style="padding:3px 8px;font-size:10px">${t}</span>${i<chain.length-1?`<span style="color:var(--tx3)">→</span>`:''}`).join('')}<span style="font-size:10px;color:var(--tx2);margin-left:8px">${rel.length+1} messages</span></div></div>
+  ${rel.length?`<div style="display:flex;flex-direction:column;gap:5px">${rel.map(m=>`<div class="sc" style="cursor:pointer" onclick="selectMsg('${m.id}')"><div style="padding:8px 11px;display:flex;gap:8px;align-items:center"><span class="mtb ${m.type==='MT564'?'b564':m.type==='MT565'?'b565':'b566'}">${m.type}</span><span style="font-family:var(--mono);font-size:10px">${m.id}</span><span style="font-size:10px;color:var(--tx2)">${CAEV[m.evType]||m.evType}</span><span style="margin-left:auto;font-size:9px;color:var(--tx3)">${fmtDT(m.date)}</span><span class="badge ${m.status==='CONFIRMED'?'conf':m.status==='ELECTED'?'elec':'pend'}">${m.status}</span></div>${m.type==='MT565'?`<div style="padding:0 11px 7px;font-size:9px;color:var(--tx2)">22H::CAOP: <strong style="color:var(--grn)">${m.electedOption}</strong> · 36B::ELIG: ${(m.qty||0).toLocaleString()} units</div>`:''}${m.type==='MT566'?`<div style="padding:0 11px 7px;font-size:9px;color:var(--tx2)">19A::ENTL: <strong style="color:var(--grn)">USD ${(m.entl||0).toFixed(2)}</strong></div>`:''}</div>`).join('')}</div>`:`<div class="empty-st" style="height:140px"><div>No related messages for this CA event</div></div>`}`;
+}
+function renderRaw(msg){
+  const p=document.getElementById('p-raw');
+  const hl=(msg.raw||'').split('\n').map(ln=>{
+    const m16=ln.match(/^(:16[RS]:)(.*)/);if(m16)return`<span class="rb">${escH(m16[1])}</span><span style="color:var(--pur2)">${escH(m16[2])}</span>`;
+    // :TAG::QUAL//VALUE
+    const mQ=ln.match(/^(:[\d]+[A-Z]?:)(:([A-Z0-9]{4})\/\/)(.*)/);
+    if(mQ)return`<span class="rt">${escH(mQ[1])}</span><span class="rq">${escH(mQ[2])}</span><span class="rv">${escH(mQ[4])}</span>`;
+    const mT=ln.match(/^(:[\d]+[A-Z]?:)(.*)/);if(mT)return`<span class="rt">${escH(mT[1])}</span><span class="rv">${escH(mT[2])}</span>`;
+    return`<span style="color:var(--tx2)">${escH(ln)}</span>`;
+  }).join('\n');
+  p.innerHTML=`<div style="display:flex;gap:7px;align-items:center;margin-bottom:11px;flex-wrap:wrap">
+    <h3 style="font-size:13px;font-weight:600">Raw SWIFT · ${msg.type}</h3>
+    <span class="mtb ${msg.type==='MT564'?'b564':msg.type==='MT565'?'b565':'b566'}">${msg.type}</span>
+    <button class="ib" onclick="copyRaw('${msg.id}')">📋 Copy</button>
+    <button class="ib" onclick="dlRaw('${msg.id}')">⬇ Download</button>
+    <div style="display:flex;gap:8px;font-size:10px;color:var(--tx3);margin-left:4px">
+      <span><span style="color:var(--teal)">■</span> Tag</span>
+      <span><span style="color:var(--coral)">■</span> ::Qualifier//</span>
+      <span><span style="color:var(--pur)">■</span> 16R/S Block</span>
+    </div>
+  </div>
+  <pre class="raw-block">${hl}</pre>`;
+}
+function copyRaw(id){const m=msgs.find(x=>x.id===id);if(m)navigator.clipboard?.writeText(m.raw||'').then(()=>toast('Copied','ok'));}
+function dlRaw(id){const m=msgs.find(x=>x.id===id);if(!m)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([m.raw||''],{type:'text/plain'}));a.download=`${m.type}_${m.caRef}_${m.id}.txt`;a.click();toast('Downloaded','ok');}
+
+// ══════════════════════════════════════════════════════════════════
+//  TRAINING PANEL
+// ══════════════════════════════════════════════════════════════════
+async function renderTraining(){
+  const p=document.getElementById('p-training');
+  // Build combined tag+qualifier pairs: observed + standard
+  const observed={};
+  msgs.forEach(msg=>(msg.tags||[]).forEach(t=>{
+    const k=`${t.tag}|${t.qualifier||''}`;
+    if(!observed[k])observed[k]={tag:t.tag,qualifier:t.qualifier||null,count:0,examples:[]};
+    observed[k].count++;if(observed[k].examples.length<2)observed[k].examples.push(t.rawAfterTag||t.value||'');
+  }));
+  // Add standard qualifier dict entries not yet observed
+  const standard={};
+  Object.entries(QLOOKUP).forEach(([tag,quals])=>Object.keys(quals).forEach(qual=>{
+    const k=`${tag}|${qual}`;if(!observed[k])standard[k]={tag,qualifier:qual,count:0,examples:[]};
+  }));
+  const allPairs=[...Object.values(observed),...Object.values(standard)].sort((a,b)=>a.tag.localeCompare(b.tag)||(a.qualifier||'').localeCompare(b.qualifier||''));
+  const eqRules=await dbAll('eqRules');enquiryRules=eqRules;
+
+  p.innerHTML=`
+  <h3 style="font-size:14px;font-weight:600;margin-bottom:13px">Training Module — Tag · Qualifier · Derivation</h3>
+
+  <!-- TAG+QUALIFIER CLASSIFICATION -->
+  <div class="tr-sec">
+    <div class="tr-hd"><h4>Tag + Qualifier Classification <span style="font-size:9px;color:var(--tx3);font-weight:400">— override per qualifier, persists to DB</span></h4>
+      <div style="display:flex;gap:5px">
+        <button class="ib" onclick="expTraining()">Export</button>
+        <button class="ib" onclick="impTraining()">Import</button>
+        <button class="ib red" onclick="resetOvrs()">Reset</button>
+      </div>
+    </div>
+    <div class="tr-body">
+      <p style="font-size:10px;color:var(--tx2);margin-bottom:10px">Each row is a unique <span style="color:var(--teal);font-family:var(--mono)">:TAG:</span> + <span style="color:var(--coral);font-family:var(--mono)">::QUALIFIER</span> pair. Override the group header, field label, and derivation format. Trained overrides show a <span style="color:var(--grn)">✦</span> badge and are applied immediately in the viewer.</p>
+      <div style="max-height:360px;overflow-y:auto">
+      <table class="trtbl" style="width:100%">
+        <thead><tr>
+          <th style="width:54px">Tag</th><th style="width:72px">Qualifier</th>
+          <th style="min-width:130px">Field Label</th><th style="min-width:120px">Group Header</th>
+          <th style="width:90px">Deriv. Format</th><th style="width:90px">Example Raw</th>
+          <th style="width:48px">Seen</th><th style="width:28px"></th>
+        </tr></thead>
+        <tbody>
+          ${allPairs.map(r=>{
+            const k=`${r.tag}|${r.qualifier||''}`;
+            const ovr=tagOverrides[k]||{};
+            const qi=resolveQ(r.tag,r.qualifier);
+            const ex=(r.examples[0]||'').slice(0,20);
+            return`<tr>
+              <td><span class="tr-tag">:${r.tag}:</span></td>
+              <td>${r.qualifier?`<span class="tr-qual">${r.qualifier}</span>`:`<span style="color:var(--tx3);font-size:9px;font-style:italic">none</span>`}</td>
+              <td>
+                <div style="font-size:10px;color:${ovr.label?'var(--grn)':'var(--tx2)'}">${escH(ovr.label||qi.l)}</div>
+                ${ovr.label?`<span class="tr-cust">custom</span>`:''}
+              </td>
+              <td>
+                <span class="tr-hdr-pill" onclick="openTagModal('${r.tag}','${r.qualifier||''}','${escH(qi.h)}')">${escH(ovr.header||qi.h)}</span>
+                ${ovr.header?`<span class="tr-cust"> ✦</span>`:''}
+              </td>
+              <td>
+                <span style="font-family:var(--mono);font-size:9px;color:${ovr.fmt&&ovr.fmt!=='raw'?'var(--grn)':'var(--tx3)'}">${ovr.fmt||qi.fmt||'raw'}</span>
+                ${ovr.fmt&&ovr.fmt!=='raw'?`<span class="tr-trained"> trained</span>`:''}
+              </td>
+              <td style="max-width:90px"><span style="font-family:var(--mono);font-size:8px;color:var(--tx3)">${escH(ex)}</span></td>
+              <td><span style="font-family:var(--mono);font-size:10px;color:${r.count?'var(--teal)':'var(--tx3)'}">${r.count||'std'}</span></td>
+              <td><span class="q-ovr" onclick="openTagModal('${r.tag}','${r.qualifier||''}','${escH(ovr.header||qi.h)}')">✎</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DERIVATION RULES -->
+  <div class="tr-sec">
+    <div class="tr-hd"><h4>Trained Derivation Rules <span style="font-size:9px;color:var(--tx3);font-weight:400">— custom value extraction per tag+qualifier</span></h4>
+      <button class="ib pri" onclick="openDeriv()">+ Add Rule</button>
+    </div>
+    <div class="tr-body">
+      <p style="font-size:10px;color:var(--tx2);margin-bottom:10px">Derivation rules teach the system how to parse raw SWIFT field values into human-readable form. They override the standard ISO format dictionary and are applied in the message viewer and export.</p>
+      <div id="drules-list">
+        ${derivRules.length?derivRules.map(r=>`
+          <div class="drule${r.fmt&&r.fmt!=='raw'?' on':''}">
+            <span class="drtag">:${r.tag}:</span>
+            <span class="drqual">${r.qualifier||'*'}</span>
+            <span class="drarr">→</span>
+            <div style="flex:1">
+              <div class="drfield">${escH(r.label||'(no label)')} <span style="color:var(--tx3);font-size:9px">in</span> ${escH(r.header||'(no header)')}</div>
+              <div class="drfn">fmt: ${r.fmt}${r.rx?` · rx: ${escH(r.rx).slice(0,30)}`:''}</div>
+            </div>
+            <span style="font-size:9px;color:var(--tx3)">${[r.applyTo564&&'564',r.applyTo565&&'565',r.applyTo566&&'566'].filter(Boolean).join('/')}</span>
+            <span class="drdel" onclick="delDerivRule(${r.id})">✕</span>
+          </div>`).join(''):`<div style="font-size:10px;color:var(--tx3);padding:8px 0">No custom derivation rules — ISO 15022 standard formats apply. Add rules to override.</div>`}
+      </div>
+    </div>
+  </div>
+
+  <!-- ENQUIRY FIELD RULES -->
+  <div class="tr-sec">
+    <div class="tr-hd"><h4>Enquiry Field Rules <span style="font-size:9px;color:var(--tx3);font-weight:400">— fields the bot returns in listing queries</span></h4>
+      <button class="ib pri" onclick="addEqRule()">+ Add</button>
+    </div>
+    <div class="tr-body">
+      <p style="font-size:10px;color:var(--tx2);margin-bottom:8px">Specify tag+qualifier pairs to include in bot listing responses. If no rules are defined, defaults (type, caRef, isin, status) are used.</p>
+      <div id="eq-body">
+        ${eqRules.map(r=>`<div class="eqrow">
+          <input value="${escH(r.name||'')}" placeholder="Name" style="width:90px" onchange="updEqR(${r.id},'name',this.value)">
+          <input value="${escH(r.tag||'')}" placeholder="Tag" style="width:44px;color:var(--teal)" onchange="updEqR(${r.id},'tag',this.value)">
+          <input value="${escH(r.qualifier||'')}" placeholder="Qual" style="width:50px;color:var(--coral)" onchange="updEqR(${r.id},'qualifier',this.value)">
+          <input value="${escH(r.label||'')}" placeholder="Display label" style="flex:1" onchange="updEqR(${r.id},'label',this.value)">
+          <span class="drdel" onclick="delEqR(${r.id})">✕</span>
+        </div>`).join('')||`<div style="font-size:10px;color:var(--tx3)">No custom rules — defaults apply</div>`}
+      </div>
+    </div>
+  </div>
+
+  <!-- KB STATS -->
+  <div class="tr-sec">
+    <div class="tr-hd"><h4>Knowledge Base Summary</h4></div>
+    <div class="tr-body">
+      <div class="kb-stats">
+        <div class="kbs"><div class="n" style="color:var(--teal)">${Object.values(observed).length}</div><div class="l">Observed TQ Pairs</div></div>
+        <div class="kbs"><div class="n" style="color:var(--coral)">${Object.keys(tagOverrides).length}</div><div class="l">TQ Overrides</div></div>
+        <div class="kbs"><div class="n" style="color:var(--grn)">${derivRules.length}</div><div class="l">Deriv. Rules</div></div>
+        <div class="kbs"><div class="n" style="color:var(--pur)">${eqRules.length}</div><div class="l">Enquiry Rules</div></div>
+        <div class="kbs"><div class="n" style="color:var(--amb)">${Object.values(QLOOKUP).reduce((a,q)=>a+Object.keys(q).length,0)}</div><div class="l">Std Qualifiers</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function addEqRule(){await dbPut('eqRules',{name:'New Rule',tag:'20C',qualifier:'CORP',label:'CA Reference'});renderTraining();}
+async function delEqR(id){await dbDel('eqRules',id);renderTraining();}
+async function updEqR(id,f,v){const r=await dbGet('eqRules',id);if(r){r[f]=v;await dbPut('eqRules',r);}}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAG OVERRIDE MODAL
+// ══════════════════════════════════════════════════════════════════
+let _mtag=null,_mqual=null;
+function openTagModal(tag,qualifier,curHdr){
+  _mtag=tag;_mqual=qualifier||null;
+  const k=`${tag}|${qualifier||''}`;const ovr=tagOverrides[k]||{};const qi=resolveQ(tag,qualifier||null);
+  document.getElementById('mo-tag').value=':'+tag+':';
+  document.getElementById('mo-qual').value=qualifier||'— none —';
+  document.getElementById('mo-std').value=qi.l;
+  document.getElementById('mo-cur').value=curHdr||qi.h;
+  document.getElementById('mo-hdr').value=ovr.header||'';
+  document.getElementById('mo-lbl').value=ovr.label||'';
+  document.getElementById('mo-fmt').value=ovr.fmt||'raw';
+  document.getElementById('mo-notes').value=ovr.notes||'';
+  const rx=document.getElementById('mo-rx');if(rx)rx.value=ovr.rx||'';
+  document.getElementById('mo-rx-row').style.display=(ovr.fmt==='custom')?'block':'none';
+  document.getElementById('tag-mbg').classList.add('show');
+  setTimeout(()=>document.getElementById('mo-hdr').focus(),80);
+}
+function closeTagModal(){document.getElementById('tag-mbg').classList.remove('show');}
+async function saveTagOverride(){
+  const tag=_mtag;if(!tag)return;
+  const qual=_mqual;const k=`${tag}|${qual||''}`;
+  const newH=document.getElementById('mo-hdr').value.trim();
+  if(!newH){toast('Enter a group header','err');return;}
+  const rec={k,tag,qualifier:qual,header:newH,label:document.getElementById('mo-lbl').value.trim(),fmt:document.getElementById('mo-fmt').value,rx:document.getElementById('mo-rx')?.value||'',notes:document.getElementById('mo-notes').value};
+  tagOverrides[k]=rec;await dbPut('tagClass',rec);
+  closeTagModal();
+  const cnt=msgs.filter(m=>(m.tags||[]).some(t=>t.tag===tag&&(t.qualifier||null)===(qual||null))).length;
+  toast(`:${tag}:${qual?'::'+qual:''} → "${newH}" (${cnt} msgs)`,'ok');
+  addBot(`✅ Trained: **:${tag}:${qual?':'+qual:''}** → header "**${newH}**"${rec.label?`, label "${rec.label}"`:''}${rec.fmt&&rec.fmt!=='raw'?`, format: **${rec.fmt}**`:''}\n\nAffects **${cnt}** messages. Viewer will show derived values on next selection.`);
+  if(selId){const msg=msgs.find(m=>m.id===selId);if(msg)renderViewer(msg);}
+  if(curView==='training')renderTraining();
+}
+async function resetOvrs(){if(!confirm('Reset all tag overrides?'))return;tagOverrides={};await dbClear('tagClass');renderTraining();toast('Overrides reset','info');}
+
+// ══════════════════════════════════════════════════════════════════
+//  DERIVATION RULE MODAL
+// ══════════════════════════════════════════════════════════════════
+function openDeriv(prefill={}){
+  document.getElementById('dr-tag').value=prefill.tag||'';
+  document.getElementById('dr-qual').value=prefill.qualifier||'';
+  document.getElementById('dr-hdr').value=prefill.header||'';
+  document.getElementById('dr-lbl').value=prefill.label||'';
+  document.getElementById('dr-fmt').value=prefill.fmt||'raw';
+  document.getElementById('dr-rx').value=prefill.rx||'';
+  document.getElementById('dr-ex').value=prefill.example||'';
+  document.getElementById('dr-notes').value=prefill.notes||'';
+  document.getElementById('dr-rx-row').style.display=(prefill.fmt==='custom')?'block':'none';
+  document.getElementById('dr-prev').style.display='none';
+  document.getElementById('deriv-mbg').classList.add('show');
+}
+function closeDeriv(){document.getElementById('deriv-mbg').classList.remove('show');}
+function updateDrPrev(){
+  const fmt=document.getElementById('dr-fmt').value;
+  const ex=document.getElementById('dr-ex').value;
+  const rx=document.getElementById('dr-rx').value;
+  if(!ex)return;
+  const m=ex.match(/^:?([A-Z0-9]{4})\/\/([\s\S]*)/);
+  const val=m?m[2].trim():ex;
+  const d=applyFmt(fmt,val,ex,rx);
+  document.getElementById('dr-prev-v').textContent=d||'(raw format — no derivation)';
+  document.getElementById('dr-prev').style.display='block';
+}
+async function saveDerivRule(){
+  const tag=document.getElementById('dr-tag').value.trim().replace(/:/g,'');
+  const qual=document.getElementById('dr-qual').value.trim();
+  if(!tag){toast('Enter tag','err');return;}
+  const rule={tag,qualifier:qual||null,header:document.getElementById('dr-hdr').value.trim(),label:document.getElementById('dr-lbl').value.trim(),fmt:document.getElementById('dr-fmt').value,rx:document.getElementById('dr-rx').value.trim(),applyTo564:document.getElementById('dr-564').checked,applyTo565:document.getElementById('dr-565').checked,applyTo566:document.getElementById('dr-566').checked,notes:document.getElementById('dr-notes').value};
+  await dbPut('derivRules',rule);derivRules=await dbAll('derivRules');
+  closeDeriv();toast(`Rule saved: :${tag}:${qual?'::'+qual:''}`,'ok');
+  addBot(`✅ Derivation rule trained:\n• Tag: **:${tag}:**  Qualifier: **${qual||'*'}**\n• Format: **${rule.fmt}**\n• Label: ${rule.label||'(unchanged)'}\n• Header: ${rule.header||'(unchanged)'}\n\nApplied immediately in message viewer.`);
+  if(curView==='training')renderTraining();
+  if(selId){const msg=msgs.find(m=>m.id===selId);if(msg&&curTab==='viewer')renderViewer(msg);}
+}
+async function delDerivRule(id){await dbDel('derivRules',id);derivRules=await dbAll('derivRules');renderTraining();toast('Rule deleted','info');}
+function expTraining(){const d={overrides:tagOverrides,derivRules,enquiryRules};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download='swift_training.json';a.click();toast('Training exported','ok');}
+function impTraining(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.overrides)for(const[k,v]of Object.entries(d.overrides)){tagOverrides[k]=v;await dbPut('tagClass',{...v,k});}if(d.derivRules)for(const r of d.derivRules)await dbPut('derivRules',r);derivRules=await dbAll('derivRules');toast('Training imported','ok');renderTraining();}catch(e){toast('Invalid file','err');}};inp.click();}
+
+// ══════════════════════════════════════════════════════════════════
+//  MQ PANEL
+// ══════════════════════════════════════════════════════════════════
+function renderMQ(){
+  const p=document.getElementById('p-mq');
+  p.innerHTML=`<h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Message Queue Configuration</h3>
+  <div class="mq-grid"><div class="oc"><h4>Connection Settings</h4>
+  <div class="or"><label>MQ Type</label><select id="mq-type"><option>IBM MQ</option><option>RabbitMQ</option><option>ActiveMQ</option><option>Kafka</option></select></div>
+  <div class="or"><label>Host</label><input id="mq-host" value="${mqCfg.host||''}" placeholder="mq.example.com"></div>
+  <div class="or"><label>Port</label><input type="number" id="mq-port" value="${mqCfg.port||1414}"></div>
+  <div class="or"><label>Queue Manager</label><input id="mq-qm" value="${mqCfg.qm||''}" placeholder="QM1"></div>
+  <div class="or"><label>Channel</label><input id="mq-ch" value="${mqCfg.ch||''}" placeholder="SYSTEM.DEF.SVRCONN"></div>
+  <div class="or"><label>Get Queue</label><input id="mq-get" value="${mqCfg.getQ||''}" placeholder="SWIFT.CA.IN"></div>
+  <div class="or"><label>Put Queue</label><input id="mq-put" value="${mqCfg.putQ||''}" placeholder="SWIFT.CA.OUT"></div>
+  <div class="or"><label>Username</label><input id="mq-user" value="${mqCfg.user||''}"></div>
+  <div class="or"><label>Password</label><input type="password" id="mq-pass"></div>
+  <div style="display:flex;gap:5px;margin-top:8px"><button class="ib grn" style="flex:1" onclick="saveMQCfg()">💾 Save</button><button class="ib" style="flex:1" onclick="testMQ()">🔌 Test</button></div></div>
+  <div class="oc"><h4>Status &amp; Controls</h4>
+  <div style="margin-bottom:10px"><span id="mq-cs" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:4px 10px;border-radius:8px;${mqConn?'background:rgba(63,185,80,.15);color:var(--grn);border:1px solid var(--grn2)':'background:var(--bg3);color:var(--tx2);border:1px solid var(--bd)'}">${mqConn?'● Connected':'○ Not Connected'}</span></div>
+  <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+  <button class="ib ${mqConn?'':'pri'}" onclick="toggleMQ()">${mqConn?'Disconnect':'Connect'}</button>
+  <button class="ib" onclick="mqGet()">📥 Get Messages</button>
+  <button class="ib" onclick="mqPush()">📤 Push Selected</button></div>
+  <div style="font-size:10px;font-weight:600;margin-bottom:5px;color:var(--tx2)">Queue Log</div>
+  <div class="mq-log" id="mq-log"><div class="mle"><span class="mlt">${new Date().toLocaleTimeString()}</span><span class="mli">Ready</span></div></div></div></div>
+  <div class="oc" style="margin-top:10px"><h4>Auto-Processing Rules</h4><div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">${[['Auto-parse incoming messages',true],['Auto-generate MT566 on MT565 receipt',false],['Duplicate message detection',true],['Store raw messages in DB',true]].map(([l,d])=>`<label style="display:flex;gap:5px;align-items:center;font-size:11px;cursor:pointer"><input type="checkbox" ${d?'checked':''} style="accent-color:var(--teal)"> ${l}</label>`).join('')}</div></div>`;
+}
+function mqLog(msg,t='mli'){const l=document.getElementById('mq-log');if(!l)return;const d=document.createElement('div');d.className='mle';d.innerHTML=`<span class="mlt">${new Date().toLocaleTimeString()}</span><span class="${t}">${escH(msg)}</span>`;l.appendChild(d);l.scrollTop=l.scrollHeight;}
+async function saveMQCfg(){mqCfg={host:document.getElementById('mq-host')?.value,port:document.getElementById('mq-port')?.value,qm:document.getElementById('mq-qm')?.value,ch:document.getElementById('mq-ch')?.value,getQ:document.getElementById('mq-get')?.value,putQ:document.getElementById('mq-put')?.value,user:document.getElementById('mq-user')?.value};await dbPut('settings',{key:'mqConfig',value:mqCfg});mqLog('Config saved','mlok');toast('MQ config saved','ok');}
+function testMQ(){mqLog(`Testing ${mqCfg.host||'?'}:${mqCfg.port||'?'}…`,'mlwn');setTimeout(()=>mqLog('Connection refused — simulation mode','mlerr'),1200);toast('Test result: see MQ log','info');}
+function toggleMQ(){mqConn=!mqConn;document.getElementById('mqdot').className='mqdot'+(mqConn?' on':'');document.getElementById('mqlabel').textContent=mqConn?'MQ: Connected':'MQ: Idle';mqLog(mqConn?'Connected (simulated)':'Disconnected',mqConn?'mlok':'mlwn');renderMQ();}
+async function mqGet(){mqLog('Polling queue…','mli');setTimeout(async()=>{const m=mkMT564();await saveMsg(m);mqLog(`Received: ${m.type} ${m.id}`,'mlok');selectMsg(m.id);toast('Received: '+m.id,'ok');},900);}
+function mqPush(){if(!selId){toast('Select a message first','err');return;}const m=msgs.find(x=>x.id===selId);mqLog(`Pushing ${m?.type} ${selId} → ${mqCfg.putQ||'?'}`,'mli');setTimeout(()=>mqLog('ACK received','mlok'),700);toast('Pushed','ok');}
+
+// ══════════════════════════════════════════════════════════════════
+//  IMPORT MODAL
+// ══════════════════════════════════════════════════════════════════
+function openImport(){document.getElementById('im-mbg').classList.add('show');setTimeout(()=>document.getElementById('im-raw').focus(),80);}
+function closeImport(){document.getElementById('im-mbg').classList.remove('show');}
+async function doImport(){
+  const raw=document.getElementById('im-raw').value.trim();
+  if(!raw){toast('Paste a SWIFT message first','err');return;}
+  const selType=document.getElementById('im-type').value;
+  const tags=parseSwift(raw);if(!tags.length){toast('No valid SWIFT tags found','err');return;}
+  const type=selType==='auto'?detectType(raw,tags):selType;
+  const caRef=extractCARef(tags)||uid('CA');
+  const withQ=tags.filter(t=>t.qualifier).length;
+  const withD=tags.filter(t=>t.derived).length;
+  const m={id:uid('MSG'),type,caRef,isin:extractISIN(tags),corp:'Imported',evType:extractEvType(tags),status:extractStatus(tags),date:new Date().toISOString(),raw,tags,notes:document.getElementById('im-notes').value,linkedTo:null};
+  await saveMsg(m);selectMsg(m.id);closeImport();document.getElementById('im-raw').value='';
+  toast(`${type} imported: ${m.id}`,'ok');
+  addBot(`✅ **${type}** imported and parsed:\n• CA Ref: **${caRef}**\n• Tags: **${tags.length}** total, **${withQ}** with qualifiers, **${withD}** with derived values\n• Event: **${m.evType}**\n\nView "Detail" tab to inspect qualifier extraction.`);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  EXPORT — real multi-sheet XLSX
+// ══════════════════════════════════════════════════════════════════
+const SH_NAMES=['Summary','MT564','MT565','MT566','Raw Messages','Tag+Qualifier Analysis','Qualifier Derivations','Event Timeline'];
+let exIdx=0;
+function renderExport(){
+  const p=document.getElementById('p-export');
+  const m4=msgs.filter(m=>m.type==='MT564'),m5=msgs.filter(m=>m.type==='MT565'),m6=msgs.filter(m=>m.type==='MT566');
+  p.innerHTML=`<h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Export Messages to Excel</h3>
+  <div class="ex-chks" id="ex-chks">${SH_NAMES.map((s,i)=>`<label class="echk on" id="echk-${i}"><input type="checkbox" checked onchange="this.closest('.echk').classList.toggle('on',this.checked)"> ${s}</label>`).join('')}</div>
+  <div class="sc"><div class="sheet-tabs">${SH_NAMES.map((s,i)=>`<div class="stab${i===0?' active':''}" onclick="prevSheet(${i},this)">${s}</div>`).join('')}</div>
+  <div class="stbl-wrap" id="ex-prev">${buildPrev(0,m4,m5,m6)}</div></div>
+  <div class="ex-btns">
+    <button class="ex-btn ex-xlsx" onclick="doXLSX()">📊 Download Excel (.xlsx)</button>
+    <button class="ex-btn ex-csv" onclick="doCSV()">📄 Download CSV</button>
+    <button class="ex-btn ex-json" onclick="doJSON()">{ } Download JSON</button>
+  </div>
+  <div style="margin-top:8px;font-size:10px;color:var(--tx3)">${msgs.length} messages · ${[...new Set(msgs.map(m=>m.caRef))].filter(Boolean).length} CA events · ${Object.keys(tagOverrides).length} trained overrides · ${derivRules.length} derivation rules</div>`;
+}
+function prevSheet(i,el){exIdx=i;document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));el.classList.add('active');const m4=msgs.filter(m=>m.type==='MT564'),m5=msgs.filter(m=>m.type==='MT565'),m6=msgs.filter(m=>m.type==='MT566');document.getElementById('ex-prev').innerHTML=buildPrev(i,m4,m5,m6);}
+
+function buildPrev(idx,m4,m5,m6){
+  const th=cols=>`<table class="stbl"><thead><tr>${cols.map(c=>`<th>${escH(c)}</th>`).join('')}</tr></thead><tbody>`;
+  const tf=`</tbody></table>`;const tr=vals=>`<tr>${vals.map(v=>`<td>${escH(String(v??''))}</td>`).join('')}</tr>`;
+  if(idx===0)return th(['Metric','Count','Unique Events','Latest'])+[['Total Messages',msgs.length,[...new Set(msgs.map(m=>m.caRef))].filter(Boolean).length,fmtDate(msgs[0]?.date)],['MT564 Notifications',m4.length,[...new Set(m4.map(m=>m.caRef))].length,fmtDate(m4[0]?.date)],['MT565 Elections',m5.length,[...new Set(m5.map(m=>m.caRef))].length,fmtDate(m5[0]?.date)],['MT566 Confirmations',m6.length,[...new Set(m6.map(m=>m.caRef))].length,fmtDate(m6[0]?.date)],['Pending',msgs.filter(m=>m.status==='PENDING').length,'-','-'],['Confirmed',msgs.filter(m=>m.status==='CONFIRMED').length,'-','-'],['Trained Overrides',Object.keys(tagOverrides).length,'-','-'],['Derivation Rules',derivRules.length,'-','-']].map(r=>tr(r)).join('')+tf;
+  if(idx===1)return th(['ID','CA Ref (20C::CORP)','ISIN (35B)','Company','Event (22F::CAEV)','Rate','Status (25D::PROC)','Date'])+m4.map(m=>tr([m.id,m.caRef,m.isin,m.corp,m.evType,m.rate||'',m.status,fmtDate(m.date)])).join('')+tf;
+  if(idx===2)return th(['ID','CA Ref','ISIN','Event','Option (22H::CAOP)','Qty (36B::ELIG)','Account (97A::SAFE)','Status','Date'])+m5.map(m=>tr([m.id,m.caRef,m.isin,m.evType,m.electedOption,m.qty,m.status,fmtDate(m.date)])).join('')+tf;
+  if(idx===3)return th(['ID','CA Ref','ISIN','Entitlement (19A::ENTL)','Status','Date'])+m6.map(m=>tr([m.id,m.caRef,m.isin,m.entl||'',m.status,fmtDate(m.date)])).join('')+tf;
+  if(idx===4)return th(['ID','Type','CA Ref','Tag Count','Qualifiers','Derived Values','Raw (first 80)'])+msgs.map(m=>{const qc=(m.tags||[]).filter(t=>t.qualifier).length;const dc=(m.tags||[]).filter(t=>t.derived).length;return tr([m.id,m.type,m.caRef,(m.tags||[]).length,qc,dc,(m.raw||'').slice(0,80)]);}).join('')+tf;
+  if(idx===5){
+    const tq={};msgs.forEach(msg=>(msg.tags||[]).forEach(t=>{const k=`${t.tag}|${t.qualifier||''}`;if(!tq[k])tq[k]={tag:t.tag,qualifier:t.qualifier||'',label:resolveQ(t.tag,t.qualifier).l,header:resolveQ(t.tag,t.qualifier).h,fmt:resolveQ(t.tag,t.qualifier).fmt,count:0,in564:0,in565:0,in566:0,trained:!!tagOverrides[k],exampleRaw:'',exampleDerived:''};tq[k].count++;if(msg.type==='MT564')tq[k].in564++;if(msg.type==='MT565')tq[k].in565++;if(msg.type==='MT566')tq[k].in566++;if(!tq[k].exampleRaw&&t.rawAfterTag){tq[k].exampleRaw=t.rawAfterTag.slice(0,40);tq[k].exampleDerived=t.derived||'';};}));
+    return th(['Tag',':Qualifier','Field Label','Group Header','Deriv. Format','Occurrences','MT564','MT565','MT566','Trained?','Example Raw','Example Derived'])+Object.values(tq).sort((a,b)=>b.count-a.count).map(t=>tr([':'+t.tag+':',t.qualifier||'—',t.label,t.header,t.fmt,t.count,t.in564,t.in565,t.in566,t.trained?'YES':'',t.exampleRaw,t.exampleDerived])).join('')+tf;
+  }
+  if(idx===6)return th(['Tag','Qualifier','Header','Label','Format','Custom Regex','Applies To','Notes'])+derivRules.map(r=>tr([':'+r.tag+':',r.qualifier||'*',r.header,r.label,r.fmt,r.rx||'',[r.applyTo564&&'564',r.applyTo565&&'565',r.applyTo566&&'566'].filter(Boolean).join('/'),r.notes||''])).join('')+(derivRules.length?'':'<tr><td colspan="8" style="color:var(--tx3);text-align:center">No derivation rules trained yet</td></tr>')+tf;
+  if(idx===7){const ev={};msgs.forEach(m=>{if(!m.caRef)return;if(!ev[m.caRef])ev[m.caRef]={caRef:m.caRef,evType:m.evType,name:CAEV[m.evType]||'',isin:m.isin,corp:m.corp,mt564:0,mt565:0,mt566:0,status:''};if(m.type==='MT564')ev[m.caRef].mt564++;if(m.type==='MT565')ev[m.caRef].mt565++;if(m.type==='MT566')ev[m.caRef].mt566++;ev[m.caRef].status=m.status;});return th(['CA Ref','Event','Name','ISIN','Company','MT564','MT565','MT566','Chain Status'])+Object.values(ev).map(e=>tr([e.caRef,e.evType,e.name,e.isin,e.corp,e.mt564,e.mt565,e.mt566,e.mt566>0?'COMPLETE':e.mt565>0?'ELECTED':'NOTIFIED'])).join('')+tf;}
+  return'';
+}
+
+function buildSheetData(idx,m4,m5,m6){
+  if(idx===0)return[['Metric','Count','Unique Events','Latest Date'],['Total Messages',msgs.length,[...new Set(msgs.map(m=>m.caRef))].filter(Boolean).length,fmtDate(msgs[0]?.date)],['MT564 Notifications',m4.length,[...new Set(m4.map(m=>m.caRef))].length,fmtDate(m4[0]?.date)],['MT565 Elections',m5.length,[...new Set(m5.map(m=>m.caRef))].length,fmtDate(m5[0]?.date)],['MT566 Confirmations',m6.length,[...new Set(m6.map(m=>m.caRef))].length,fmtDate(m6[0]?.date)],['Pending Messages',msgs.filter(m=>m.status==='PENDING').length,'','-'],['Confirmed Messages',msgs.filter(m=>m.status==='CONFIRMED').length,'','-'],['Trained TQ Overrides',Object.keys(tagOverrides).length,'','-'],['Custom Derivation Rules',derivRules.length,'','-']];
+  if(idx===1)return[['ID','CA Ref (20C::CORP)','ISIN (35B)','Company','Event Type (22F::CAEV)','Rate (92A::NETT)','Status (25D::PROC)','Date'],...m4.map(m=>[m.id,m.caRef,m.isin,m.corp,m.evType,m.rate||'',m.status,fmtDate(m.date)])];
+  if(idx===2)return[['ID','CA Ref','ISIN','Event','Elected Option (22H::CAOP)','Quantity (36B::ELIG)','Status','Date'],...m5.map(m=>[m.id,m.caRef,m.isin,m.evType,m.electedOption,m.qty,m.status,fmtDate(m.date)])];
+  if(idx===3)return[['ID','CA Ref','ISIN','Cash Entitlement (19A::ENTL)','Status','Date'],...m6.map(m=>[m.id,m.caRef,m.isin,m.entl||'',m.status,fmtDate(m.date)])];
+  if(idx===4)return[['ID','Type','CA Ref','Tag Count','Tags With Qualifier','Tags With Derived Value','Raw Message'],...msgs.map(m=>{const qc=(m.tags||[]).filter(t=>t.qualifier).length;const dc=(m.tags||[]).filter(t=>t.derived).length;return[m.id,m.type,m.caRef,(m.tags||[]).length,qc,dc,m.raw||''];})];
+  if(idx===5){const tq={};msgs.forEach(msg=>(msg.tags||[]).forEach(t=>{const k=`${t.tag}|${t.qualifier||''}`;if(!tq[k])tq[k]={tag:t.tag,qualifier:t.qualifier||'',label:resolveQ(t.tag,t.qualifier).l,header:resolveQ(t.tag,t.qualifier).h,fmt:resolveQ(t.tag,t.qualifier).fmt,count:0,in564:0,in565:0,in566:0,trained:!!tagOverrides[k],exRaw:'',exDerived:''};tq[k].count++;if(msg.type==='MT564')tq[k].in564++;if(msg.type==='MT565')tq[k].in565++;if(msg.type==='MT566')tq[k].in566++;if(!tq[k].exRaw&&t.rawAfterTag){tq[k].exRaw=(t.rawAfterTag||'').slice(0,40);tq[k].exDerived=t.derived||'';};}));return[['Tag',':Qualifier','Field Label','Group Header','Derivation Format','Total Occurrences','In MT564','In MT565','In MT566','Trained?','Example Raw Value','Example Derived Value'],...Object.values(tq).sort((a,b)=>b.count-a.count).map(t=>[':'+t.tag+':',t.qualifier||'—',t.label,t.header,t.fmt,t.count,t.in564,t.in565,t.in566,t.trained?'YES':'NO',t.exRaw,t.exDerived])];}
+  if(idx===6)return[['Tag','Qualifier','Group Header','Field Label','Derivation Format','Custom Regex','Applies To','Notes'],...derivRules.map(r=>[':'+r.tag+':',r.qualifier||'*',r.header,r.label,r.fmt,r.rx||'',[r.applyTo564&&'564',r.applyTo565&&'565',r.applyTo566&&'566'].filter(Boolean).join('/'),r.notes||''])];
+  if(idx===7){const ev={};msgs.forEach(m=>{if(!m.caRef)return;if(!ev[m.caRef])ev[m.caRef]={caRef:m.caRef,evType:m.evType,name:CAEV[m.evType]||'',isin:m.isin,corp:m.corp,mt564:0,mt565:0,mt566:0,status:''};if(m.type==='MT564')ev[m.caRef].mt564++;if(m.type==='MT565')ev[m.caRef].mt565++;if(m.type==='MT566')ev[m.caRef].mt566++;ev[m.caRef].status=m.status;});return[['CA Ref','Event Type','Event Name','ISIN','Company','MT564 Count','MT565 Count','MT566 Count','Chain Status'],...Object.values(ev).map(e=>[e.caRef,e.evType,e.name,e.isin,e.corp,e.mt564,e.mt565,e.mt566,e.mt566>0?'COMPLETE':e.mt565>0?'ELECTED':'NOTIFIED'])];}
+  return[];
+}
+
+function doXLSX(){
+  if(typeof XLSX==='undefined'){doCSV();return;}
+  const wb=XLSX.utils.book_new();
+  const m4=msgs.filter(m=>m.type==='MT564'),m5=msgs.filter(m=>m.type==='MT565'),m6=msgs.filter(m=>m.type==='MT566');
+  SH_NAMES.forEach((name,i)=>{
+    const chk=document.getElementById('echk-'+i)?.querySelector('input');if(chk&&!chk.checked)return;
+    const data=buildSheetData(i,m4,m5,m6);if(!data||!data.length)return;
+    const ws=XLSX.utils.aoa_to_sheet(data);
+    ws['!cols']=data[0].map((_,ci)=>({wch:Math.max(10,...data.map(r=>String(r[ci]||'').length))+2}));
+    XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31));
+  });
+  const fn=`SWIFT_CA_QualifierEnhanced_${new Date().toISOString().slice(0,10)}.xlsx`;
+  XLSX.writeFile(wb,fn);toast('Excel exported: '+fn,'ok');
+  addBot(`📊 Excel exported with **${SH_NAMES.length} sheets** including:\n• Tag+Qualifier Analysis (every tag+qualifier pair with derived values)\n• Qualifier Derivation Rules (trained rules)\n• MT564/565/566 tabs with qualifier field names in column headers\n\nFile: \`${fn}\``);
+}
+function doCSV(){const m4=msgs.filter(m=>m.type==='MT564'),m5=msgs.filter(m=>m.type==='MT565'),m6=msgs.filter(m=>m.type==='MT566');const rows=[...buildSheetData(1,m4,m5,m6),[],[...buildSheetData(2,m4,m5,m6)],[],[...buildSheetData(3,m4,m5,m6)]];const csv=rows.map(r=>(r||[]).map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`SWIFT_CA_${new Date().toISOString().slice(0,10)}.csv`;a.click();toast('CSV exported','ok');}
+function doJSON(){const out={exportDate:new Date().toISOString(),version:'3.0',tagOverrides,derivRules,messages:msgs.map(m=>({...m,tagSummary:(m.tags||[]).map(t=>({tag:t.tag,qualifier:t.qualifier||null,value:t.value,derived:t.derived||null}))}))};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:'application/json'}));a.download=`SWIFT_CA_${new Date().toISOString().slice(0,10)}.json`;a.click();toast('JSON exported','ok');}
+
+// ══════════════════════════════════════════════════════════════════
+//  ANALYTICS
+// ══════════════════════════════════════════════════════════════════
+function renderAnalytics(){
+  const p=document.getElementById('p-analytics');
+  const m4=msgs.filter(m=>m.type==='MT564'),m5=msgs.filter(m=>m.type==='MT565'),m6=msgs.filter(m=>m.type==='MT566');
+  const stp=m5.length?Math.round(m6.length/m5.length*100):0;
+  const evtp={};msgs.filter(m=>m.evType).forEach(m=>evtp[m.evType]=(evtp[m.evType]||0)+1);
+  const topEv=Object.entries(evtp).sort((a,b)=>b[1]-a[1]);const mxEv=Math.max(1,...topEv.map(e=>e[1]));
+  const sts={};msgs.forEach(m=>sts[m.status||'?']=(sts[m.status||'?']||0)+1);const mxSt=Math.max(1,...Object.values(sts));
+  // Qualifier usage
+  const qu={};msgs.forEach(msg=>(msg.tags||[]).filter(t=>t.qualifier).forEach(t=>{qu[t.qualifier]=(qu[t.qualifier]||0)+1;}));
+  const topQ=Object.entries(qu).sort((a,b)=>b[1]-a[1]).slice(0,8);const mxQ=Math.max(1,...topQ.map(e=>e[1]));
+  // Derivation stats
+  const totalTags=msgs.reduce((a,m)=>a+(m.tags||[]).length,0);
+  const withQual=msgs.reduce((a,m)=>a+(m.tags||[]).filter(t=>t.qualifier).length,0);
+  const withDerived=msgs.reduce((a,m)=>a+(m.tags||[]).filter(t=>t.derived).length,0);
+  p.innerHTML=`<h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Analytics Dashboard</h3>
+  <div class="an-kpi">${[['Total Msgs',msgs.length,'var(--tx)'],['MT564',m4.length,'var(--teal)'],['MT565',m5.length,'var(--pur)'],['MT566',m6.length,'var(--grn)'],['CA Events',[...new Set(msgs.map(m=>m.caRef))].filter(Boolean).length,'var(--amb)']].map(([l,v,c])=>`<div class="an-k"><div class="v" style="color:${c}">${v}</div><div class="l">${l}</div></div>`).join('')}</div>
+  <div class="an-2col">
+    <div class="sc"><div class="sc-hd">Event Types (22F::CAEV)</div><div style="padding:10px">${topEv.map(([k,v])=>`<div class="br"><span class="brl">${k}</span><div class="brt"><div class="brf" style="width:${Math.round(v/mxEv*100)}%;background:var(--teal)"></div></div><span class="brv">${v}</span></div>`).join('')||'<div style="font-size:10px;color:var(--tx3)">No data</div>'}</div></div>
+    <div class="sc"><div class="sc-hd">Top Qualifiers Used</div><div style="padding:10px">${topQ.map(([k,v])=>`<div class="br"><span class="brl" style="color:var(--coral)">${k}</span><div class="brt"><div class="brf" style="width:${Math.round(v/mxQ*100)}%;background:var(--coral)"></div></div><span class="brv">${v}</span></div>`).join('')||'<div style="font-size:10px;color:var(--tx3)">No data</div>'}</div></div>
+  </div>
+  <div class="an-2col">
+    <div class="sc"><div class="sc-hd">Processing Status</div><div style="padding:10px">${Object.entries(sts).map(([k,v])=>`<div class="br"><span class="brl" style="font-size:9px">${k}</span><div class="brt"><div class="brf" style="width:${Math.round(v/mxSt*100)}%;background:${k==='CONFIRMED'?'var(--grn)':k==='ELECTED'?'var(--pur)':'var(--amb)'}"></div></div><span class="brv">${v}</span></div>`).join('')}</div></div>
+    <div class="sc"><div class="sc-hd">Qualifier Coverage</div><div style="padding:14px">
+      <div style="text-align:center;margin-bottom:12px"><div style="font-family:var(--mono);font-size:32px;font-weight:700;color:var(--teal)">${totalTags?Math.round(withQual/totalTags*100):0}%</div><div style="font-size:10px;color:var(--tx2)">Tags with Qualifier</div></div>
+      ${[['Tags With Qualifier',totalTags?Math.round(withQual/totalTags*100):0,'var(--teal)'],['Tags With Derived Value',totalTags?Math.round(withDerived/totalTags*100):0,'var(--grn)'],['MT564→MT565 Rate',m4.length?Math.round(m5.length/m4.length*100):0,'var(--pur)'],['STP Rate (MT565→MT566)',stp,'var(--grn)'],['Trained Overrides',Object.keys(tagOverrides).length,'var(--coral)']].map(([l,v,c])=>`<div class="br"><span class="brl" style="min-width:160px;font-size:9px;text-align:left">${l}</span><div class="brt"><div class="brf" style="width:${Math.min(100,v)}%;background:${c}"></div></div><span class="brv">${v}${typeof v==='number'&&l.includes('Rate')||l.includes('STP')||l.includes('Tags')?'%':''}</span></div>`).join('')}
+    </div></div>
+  </div>
+  <div style="display:flex;gap:7px"><button class="ib" onclick="switchView('export')">📥 Export Report</button><button class="ib" onclick="genBulk()">⚡ Generate Test Data</button><button class="ib" onclick="switchView('training')">🎓 Training Module</button></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CHATBOT
+// ══════════════════════════════════════════════════════════════════
+function setCM(m){chatMode=m;document.querySelectorAll('.cmt').forEach((t,i)=>t.classList.toggle('active',['query','train','mq'][i]===m));const h={query:['List MT564','Find DVCA','Show :20C::CORP values','Statistics'],train:['Train :22F::CAEV','Add derivation rule','Show overrides','Export training'],mq:['Test connection','Poll queue','Push selected']};addBot(`**${m.toUpperCase()} MODE** · Try: ${h[m].map(x=>`"${x}"`).join(', ')}`);}
+function botGreet(){
+  const c=document.getElementById('ch-msgs');
+  // render a rich section-card welcome
+  const d=document.createElement('div');d.className='cm bot';
+  d.innerHTML=`<div class="mb" style="padding:0">
+    <div style="padding:8px 10px 4px;font-size:12px;font-weight:600;color:var(--teal)">◈ SWIFT-HUB v4.0 — Corporate Actions Platform</div>
+    <div style="padding:4px 10px 8px;font-size:10px;color:var(--tx2)">Qualifier-Enhanced · ISO 15022 · Fully Offline</div>
+    <div class="ch-section">
+      <div class="ch-section-title">📨 Messages Section</div>
+      <p>Manage MT564/MT565/MT566 corporate action messages. Each tag is parsed with its <span style="color:var(--coral);font-family:var(--mono)">::QUALIFIER</span> and derived value auto-formatted (dates, amounts, rates).</p>
+      <div class="ch-fn"><span class="ch-fn-tag" onclick="injectChat('list MT564')">List MT564</span><span class="ch-fn-tag" onclick="injectChat('find DVCA')">Find DVCA</span><span class="ch-fn-tag" onclick="genS564()">Generate</span><span class="ch-fn-tag" onclick="openImport()">Import Raw</span></div>
+    </div>
+    <div class="ch-section">
+      <div class="ch-section-title">🔍 Message Retrieval</div>
+      <p>Retrieve messages by CA reference, safekeeping account (97A::SAFE), ISIN (35B), or message type. Click the <strong>Retrieve</strong> tab or use the chat.</p>
+      <div class="ch-fn"><span class="ch-fn-tag" onclick="switchTab('retrieve')">Open Retrieval</span><span class="ch-fn-tag" onclick="injectChat('retrieve MT564')">By Type</span><span class="ch-fn-tag" onclick="injectChat('retrieve by safe account')">By Safe Acct</span></div>
+    </div>
+    <div class="ch-section">
+      <div class="ch-section-title">⚡ MT565 Election</div>
+      <p>Elect options (CASH, SECU, DRIP, NOAC) against an MT564 notification. Quantity is validated against the MT564 eligible balance (93B::ELIG) — over-election is blocked.</p>
+      <div class="ch-fn"><span class="ch-fn-tag" onclick="switchTab('options')">Options Panel</span><span class="ch-fn-tag" onclick="injectChat('validate qty')">Check Limits</span></div>
+    </div>
+    <div class="ch-section">
+      <div class="ch-section-title">✓ MT566 Confirmation</div>
+      <p>Generate confirmations from elected MT565s. Set entitlement (19A::ENTL), gross (19A::GRSS), tax rate (92A::TAXR), and payment date (98A::PAYD).</p>
+      <div class="ch-fn"><span class="ch-fn-tag" onclick="switchTab('gen566')">Gen MT566</span><span class="ch-fn-tag" onclick="injectChat('generate confirmation')">Generate</span></div>
+    </div>
+    <div class="ch-section">
+      <div class="ch-section-title">🎓 Training Module</div>
+      <p>Override any Tag+Qualifier label, group header, and derivation format. Add custom derivation rules (date, amount, rate, custom regex). Training persists to IndexedDB.</p>
+      <div class="ch-fn"><span class="ch-fn-tag" onclick="switchView('training')">Training Panel</span><span class="ch-fn-tag" onclick="injectChat('show overrides')">Show Overrides</span><span class="ch-fn-tag" onclick="openDeriv()">Add Rule</span></div>
+    </div>
+    <div class="ch-section">
+      <div class="ch-section-title">📡 Message Queue · 📊 Export · 📈 Analytics</div>
+      <p>Connect to IBM MQ / RabbitMQ for live ingestion. Export to multi-sheet <strong>Excel (.xlsx)</strong> including Tag+Qualifier analysis. Analytics shows STP rate, event-type breakdown, and qualifier coverage.</p>
+      <div class="ch-fn"><span class="ch-fn-tag" onclick="switchView('mq')">MQ Config</span><span class="ch-fn-tag" onclick="switchView('export')">Export Excel</span><span class="ch-fn-tag" onclick="switchView('analytics')">Analytics</span></div>
+    </div>
+  </div><div class="ch-time">${new Date().toLocaleTimeString()}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function addBot(text,sugs=[]){const c=document.getElementById('ch-msgs');const d=document.createElement('div');d.className='cm bot';const f=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`(.+?)`/g,'<code>$1</code>').replace(/\n/g,'<br>');d.innerHTML=`<div class="mb">${f}</div><div class="ch-time">${new Date().toLocaleTimeString()}</div>${sugs.length?`<div class="ch-sugs">${sugs.map(s=>`<span class="sug" onclick="injectChat('${escH(s)}')">${escH(s)}</span>`).join('')}</div>`:''}`;c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function addUser(t){const c=document.getElementById('ch-msgs');const d=document.createElement('div');d.className='cm user';d.innerHTML=`<div class="mb">${escH(t)}</div><div class="ch-time">${new Date().toLocaleTimeString()}</div>`;c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function addTyping(){const c=document.getElementById('ch-msgs');const d=document.createElement('div');d.className='cm bot typing';d.id='typing';d.innerHTML='<div class="mb"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>';c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function rmTyping(){document.getElementById('typing')?.remove();}
+function injectChat(t){document.getElementById('ch-in').value=t;sendChat();}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+function sendChat(){const el=document.getElementById('ch-in');const t=el.value.trim();if(!t)return;el.value='';addUser(t);addTyping();setTimeout(()=>{rmTyping();processChat(t);},500+Math.random()*300);}
+
+function processChat(text){
+  const q=text.toLowerCase();
+  if(chatMode==='mq'){if(q.includes('test')||q.includes('connect')){testMQ();switchView('mq');}else if(q.includes('poll')||q.includes('get'))mqGet();else if(q.includes('push'))mqPush();else addBot('MQ: "test connection", "poll queue", "push selected"');return;}
+  if(chatMode==='train'){
+    if(q.includes('train')||q.includes('classif')||q.includes('override')){switchView('training');addBot('Opening Training Module — use the tag+qualifier table to override labels, headers, and derivation formats.');}
+    else if(q.includes('deriv')||q.includes('rule')){openDeriv();addBot('Derivation Rule editor opened.');}
+    else if(q.includes('show override')){const n=Object.keys(tagOverrides).length;addBot(n?`**${n} overrides:**\n${Object.entries(tagOverrides).map(([k,v])=>`• \`${k}\` → "${v.header}"${v.fmt&&v.fmt!=='raw'?` [${v.fmt}]`:''}`).join('\n')}`:'No overrides yet.');}
+    else if(q.includes('export'))expTraining();
+    else addBot('Train mode: "training module", "add derivation rule", "show overrides", "export training"');
+    return;
+  }
+  // Query mode
+  // RETRIEVAL commands
+  if(q.includes('retrieve')||q.includes('find by safe')||q.includes('search by ref')){
+    switchTab('retrieve');renderRetrieve();
+    const safeM=text.match(/safe[\s_-]*(acct|account)?[\s:]*([A-Z0-9]+)/i);
+    const refM=text.match(/ref[\s:]+([A-Z0-9]+)/i);
+    const typeM565=q.includes('565'),typeM564=q.includes('564'),typeM566=q.includes('566');
+    setTimeout(()=>{
+      if(safeM&&safeM[2]){const el=document.getElementById('ret-safe');if(el)el.value=safeM[2].toUpperCase();}
+      if(refM&&refM[1]){const el=document.getElementById('ret-ref');if(el)el.value=refM[1].toUpperCase();}
+      if(typeM565){const el=document.getElementById('ret-type');if(el)el.value='MT565';}
+      else if(typeM564){const el=document.getElementById('ret-type');if(el)el.value='MT564';}
+      else if(typeM566){const el=document.getElementById('ret-type');if(el)el.value='MT566';}
+      retrieveMessages();
+    },100);
+    addBot(`🔍 Opening Retrieval panel${safeM?' · Safe: **'+safeM[2]+'**':''}${refM?' · Ref: **'+refM[1]+'**':''}${typeM565?' · Type: MT565':typeM564?' · Type: MT564':typeM566?' · Type: MT566':''}\n\nYou can also search by ISIN, partial reference, or combine multiple criteria.`,['Retrieve MT564','Retrieve MT565','Retrieve MT566','Retrieve by safe account']);
+    return;
+  }
+  // VALIDATION query
+  if(q.includes('valid')||q.includes('qty limit')||q.includes('eligible')||q.includes('balance')){
+    const m4s=msgs.filter(m=>m.type==='MT564');
+    if(!m4s.length){addBot('No MT564 messages in DB. Generate one first to see eligible balance validation.',['Generate MT564']);return;}
+    const rows=m4s.map(m=>{const e=extractEligQty(m.tags||[]);const elec=msgs.filter(x=>x.type==='MT565'&&x.caRef===m.caRef).reduce((a,x)=>a+(x.qty||0),0);return `• \`${m.caRef}\` — Eligible: **${e.toLocaleString()} units**, Elected: **${elec.toLocaleString()}**, Remaining: **${Math.max(0,e-elec).toLocaleString()}**`;});
+    addBot(`**MT564 Eligible Balance Summary (93B::ELIG):**\n${rows.join('\n')}\n\nMT565 elections exceeding the eligible balance are **blocked at submission**.`,['Open Options Panel']);
+    return;
+  }
+  // HELP with sections
+  if(q.includes('help')||q.includes('how')||q.includes('what can')){
+    addBot(`**SWIFT-HUB v4.0 — Quick Reference:**\n\n**🔍 Retrieve:** "retrieve MT564", "retrieve by safe ACCT1234", "find ref CA123"\n**📨 Messages:** "list MT564/565/566", "find DVCA", "search ISIN GB000..."\n**⚡ Election:** "elect options" → Options tab, qty validated vs 93B::ELIG\n**✓ Confirm:** "generate MT566" or "generate confirmation"\n**🎓 Train:** "train :22F::CAEV", "show overrides", "add derivation rule"\n**📡 MQ:** "test connection", "poll queue", "push selected"\n**📊 Export:** "export excel" — 8 sheets incl. qualifier analysis\n**📈 Analytics:** "show analytics", "stp rate", "qualifier coverage"`,['Retrieve messages','List MT564','Statistics','Training module']);
+    return;
+  }
+  const typeM=q.match(/mt5(6[456])/)
+  if(typeM||q.startsWith('list')){const type=typeM?`MT5${typeM[1]}`:null;const found=type?msgs.filter(m=>m.type===type):msgs;addBot(found.length?`**${found.length}** ${type||'messages'}:\n${found.slice(0,10).map(m=>`\`${m.id}\` · **${m.type}** · ${m.caRef} · ${m.evType} · ${m.status}`).join('\n')}${found.length>10?`\n…+${found.length-10} more`:''}`:`No ${type||'messages'} found.`,[`Generate ${type||'MT564'}`]);return;}
+  // tag+qualifier query: :20C::CORP or 20C::CORP
+  const tqM=text.match(/:?(\d{1,3}[A-Z]?)::?([A-Z]{4})/);
+  if(tqM){const tag=tqM[1],qual=tqM[2];const results=[];msgs.forEach(m=>(m.tags||[]).forEach(t=>{if(t.tag===tag&&t.qualifier===qual){results.push(`\`${m.id}\` [${m.type}] → ${t.derived||t.value}`);}  }));addBot(results.length?`**:${tag}::${qual}** found in **${results.length}** places:\n${results.slice(0,12).join('\n')}`:`No values found for **:${tag}::${qual}**. Import or generate messages containing this tag+qualifier.`);return;}
+  const evM=q.match(/\b(dvca|bonu|rhts|tend|mrgr|splf|intr|capd|conv|drip|redm|extm|soff)\b/i);
+  if(evM){const et=evM[1].toUpperCase();const found=msgs.filter(m=>m.evType===et);addBot(found.length?`**${found.length}** ${et} messages:\n${found.map(m=>`\`${m.id}\` · ${m.type} · ${m.caRef} · ${m.status}`).join('\n')}`:`No ${et} events.`);return;}
+  const isinM=text.match(/\b([A-Z]{2}[A-Z0-9]{10})\b/);
+  if(isinM){const isin=isinM[1];const found=msgs.filter(m=>m.isin===isin);addBot(found.length?`**${found.length}** messages for ISIN **${isin}** (35B):\n${found.map(m=>`\`${m.id}\` · ${m.type} · ${m.status}`).join('\n')}`:`ISIN ${isin} not found.`);return;}
+  if(q.includes('pending')){const f=msgs.filter(m=>m.status==='PENDING');addBot(`**${f.length}** pending:\n${f.slice(0,8).map(m=>`\`${m.id}\` · ${m.type} · ${m.caRef}`).join('\n')||'None.'}`);return;}
+  if(q.includes('qualifier')||q.includes('tags')){const tq=new Set(msgs.flatMap(m=>(m.tags||[]).filter(t=>t.qualifier).map(t=>`${t.tag}::${t.qualifier}`)));addBot(`**${tq.size}** unique Tag+Qualifier pairs in current messages:\n${[...tq].sort().slice(0,15).join(', ')}${tq.size>15?`\n…+${tq.size-15} more`:''}\n\nGo to **Training** to override any pair.`,['Training module']);}
+  else if(q.includes('stat')||q.includes('summar')||q.includes('how many')){const tq=new Set(msgs.flatMap(m=>(m.tags||[]).filter(t=>t.qualifier).map(t=>t.tag+'::'+t.qualifier)));const dr=msgs.reduce((a,m)=>a+(m.tags||[]).filter(t=>t.derived).length,0);addBot(`**Summary:**\n• Messages: **${msgs.length}** (MT564:${msgs.filter(m=>m.type==='MT564').length} / MT565:${msgs.filter(m=>m.type==='MT565').length} / MT566:${msgs.filter(m=>m.type==='MT566').length})\n• CA Events: **${[...new Set(msgs.map(m=>m.caRef))].filter(Boolean).length}**\n• Unique Tag+Qualifier pairs: **${tq.size}**\n• Fields with derived values: **${dr}**\n• Trained overrides: **${Object.keys(tagOverrides).length}**\n• Derivation rules: **${derivRules.length}**`,['Export Excel','Analytics','Training module']);}
+  else if(q.includes('generat')||q.includes('sample')){if(q.includes('565'))genS565();else genS564();}
+  else if(q.includes('export')||q.includes('excel')){switchView('export');addBot('Export panel opened. The Tag+Qualifier Analysis sheet shows every tag+qualifier pair with derived values across all messages.');}
+  else if(q.includes('analytic')||q.includes('dashboard')){switchView('analytics');addBot('Opening Analytics with qualifier coverage statistics.');}
+  else if(q.includes('import')){openImport();addBot('Import window opened. Qualifiers will be extracted from each tag automatically.');}
+  else addBot(`Try:\n• **"retrieve MT565"** — retrieval panel by type\n• **"retrieve by safe ACCT123"** — by safe account\n• **"list MT564"** — browse messages\n• **":20C::CORP"** — find by tag+qualifier\n• **"find DVCA"** — by event type\n• **"validate qty"** — check eligible balance limits\n• **"statistics"** — summary · **"help"** — full guide`,['Retrieve messages','List MT564','Statistics','Generate sample']);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  STATUS BAR
+// ══════════════════════════════════════════════════════════════════
+function updateStats(){
+  document.getElementById('s-tot').textContent=msgs.length;
+  document.getElementById('s-564').textContent=msgs.filter(m=>m.type==='MT564').length;
+  document.getElementById('s-565').textContent=msgs.filter(m=>m.type==='MT565').length;
+  document.getElementById('s-566').textContent=msgs.filter(m=>m.type==='MT566').length;
+  document.getElementById('s-evts').textContent=[...new Set(msgs.map(m=>m.caRef))].filter(Boolean).length;
+  document.getElementById('s-pend').textContent=msgs.filter(m=>m.status==='PENDING').length;
+  document.getElementById('s-conf').textContent=msgs.filter(m=>m.status==='CONFIRMED').length;
+  const sz=Math.round(JSON.stringify(msgs).length/1024);
+  document.getElementById('s-db').textContent=sz+' KB';
+  document.getElementById('pb-f').style.width=Math.min(100,sz/500*100)+'%';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════════════
+function toast(msg,type='info'){const t=document.getElementById('toast');const d=document.createElement('div');d.className=`ti ${type}`;const ic={ok:'✓',err:'✕',info:'ℹ'};d.innerHTML=`<span style="color:${type==='ok'?'var(--grn)':type==='err'?'var(--red)':'var(--blue)'}">${ic[type]||'ℹ'}</span>${escH(msg)}`;t.appendChild(d);setTimeout(()=>d.remove(),3500);}
+
+// ══════════════════════════════════════════════════════════════════
+//  BOOTSTRAP
+// ══════════════════════════════════════════════════════════════════
+async function boot(){
+  await initDB();
+  msgs=await dbAll('messages');
+  const ovrs=await dbAll('tagClass');
+  ovrs.forEach(o=>{const k=o.k||`${o.tag}|${o.qualifier||''}`;tagOverrides[k]=o;});
+  derivRules=await dbAll('derivRules');
+  enquiryRules=await dbAll('eqRules');
+  const mqS=await dbGet('settings','mqConfig');if(mqS)mqCfg=mqS.value||{};
+  // re-parse tags with qualifier engine for any legacy messages
+  msgs=msgs.map(m=>{if(m.tags&&m.tags.length&&m.tags[0].rawAfterTag!==undefined)return m;return{...m,tags:parseSwift(m.raw||'')};});
+  renderList();updateStats();botGreet();
+  if(!msgs.length)setTimeout(()=>genS564(),600);
+  else{const latest=msgs.sort((a,b)=>new Date(b.date)-new Date(a.date))[0];selectMsg(latest.id);}
+}
+boot();
+</script>
+</body>
+</html>
